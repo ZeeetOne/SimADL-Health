@@ -25,7 +25,7 @@ Changes are **relative to the persona's own baseline** (hh113 vs hh115 night-toi
 
 | Parameter | Change at full intensity | Onset / time course | Tag | Basis |
 |---|---|---|---|---|
-| total time out of home | **−0.52 h/day** | linear ramp over 14 days, then plateau | SOURCED | Weeks with low mood: β = −0.52 h/day time out-of-home (85 older adults living alone, in-home sensors, up to 1 year) [P1]. Implemented by scaling `outings` and `trip_scale` so the persona's daily total drops by 0.52 h. |
+| total time out of home | **−0.52 h/day** | linear ramp over 14 days, then plateau | SOURCED | Weeks with low mood: β = −0.52 h/day time out-of-home (85 older adults living alone, in-home sensors, up to 1 year) [P1]. Implemented as fewer outings (lower probability of leaving), sized with the persona's mean trip length and a 1.4 gain for crowded-day compensation; realised effect is checked in `outputs/t4_summary.txt`. |
 | `phone_calls`, `guest_visits` | **−30 %** | same ramp | DIRECTION | Loss of interest and social withdrawal (DSM-5 criterion A2) [D1]. Loneliness also lowers time out [P1]. Magnitude is ours. |
 | `sleep_onset` | **+45 min later** | same ramp | DIRECTION | Longer sleep latency in older adults with depression [B1], and insomnia/hypersomnia in DSM-5 criterion A4 [D1]. We model the insomnia variant. Magnitude is ours. |
 | `extra_awakenings` | **+0.5 /night** | same ramp | DIRECTION | Depressive symptoms are associated with objective sleep fragmentation in older adults [B1]. |
