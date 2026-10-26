@@ -149,6 +149,12 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 ### Shahid Z. K., Saguna S., Åhlund C., 2022 — JMIR Aging — `MEMORY` — T6 baseline
 - About 2 years of smart-home data from older adults. Anomaly if activity duration is outside [μ − 2σ, μ + 2σ] or the activity is missing.
 
+### Killick R., Fearnhead P., Eckley I., 2012 — *Optimal detection of changepoints with a linear computational cost* (PELT), JASA — `MEMORY` — T6
+- PELT change-point algorithm, used via the `ruptures` library (Truong, Oudre, Vayatis, 2020, *Selective review of offline change point detection methods*, Signal Processing). Docs: https://centre-borelli.github.io/ruptures-docs/
+
+### Liu F. T., Ting K. M., Zhou Z.-H., 2008 — *Isolation Forest*, ICDM — `MEMORY` — T6
+- Unsupervised anomaly score from average path length in random isolation trees (scikit-learn `IsolationForest`).
+
 ### Ugwu, Fritz, Cook, Doppa — clinician-in-the-loop UTI recurrence (AAAI) — `MEMORY` — T8
 - Clinically relevant behavioural markers from ambient sensors. Reference for the clinician-facing report format.
 

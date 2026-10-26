@@ -1,0 +1,7 @@
+method,persona,false_alarms,normal_days,false_alarms_per_30d
+iforest,hh113,451.0,7088.0,1.909
+iforest,hh115,442.0,7110.0,1.865
+pelt,hh113,68.0,7088.0,0.288
+pelt,hh115,76.0,7110.0,0.321
+zscore,hh113,785.0,7088.0,3.323
+zscore,hh115,783.0,7110.0,3.304

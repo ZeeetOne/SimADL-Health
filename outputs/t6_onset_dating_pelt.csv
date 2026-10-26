@@ -1,0 +1,7 @@
+condition,persona,median_error,median_abs_error,within_7_days
+cognitive,hh113,-3.0,7.0,0.5
+cognitive,hh115,5.5,8.5,0.5
+depression,hh113,3.5,5.5,0.75
+depression,hh115,5.0,7.0,0.75
+uti,hh113,0.0,2.0,0.68
+uti,hh115,-2.0,6.0,0.63

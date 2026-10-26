@@ -1,0 +1,73 @@
+=== default thresholds (zscore 2 sigma, iforest 99th pct of baseline, pelt RMS z > 1)
+episode detection:
+                            episodes    recall  median_delay_days
+method  condition  persona                                       
+iforest cognitive  hh113           8       1.0               10.5
+                   hh115           8       1.0                4.5
+        depression hh113           8     0.875                5.0
+                   hh115           8       1.0               13.0
+        uti        hh113          19  0.842105                0.0
+                   hh115          19  0.947368                2.5
+pelt    cognitive  hh113           8       1.0               35.0
+                   hh115           8       1.0               21.5
+        depression hh113           8     0.875                6.0
+                   hh115           8       0.5               17.5
+        uti        hh113          19  0.263158                2.0
+                   hh115          19  0.368421                2.0
+zscore  cognitive  hh113           8       1.0                2.5
+                   hh115           8       1.0                0.5
+        depression hh113           8       1.0                2.5
+                   hh115           8       1.0                0.0
+        uti        hh113          19  0.473684                0.0
+                   hh115          19  0.789474                0.0
+false alarms on normal days (alarm onsets per 30 days):
+                 false_alarms  normal_days  false_alarms_per_30d
+method  persona                                                 
+iforest hh113           451.0       7088.0                 1.909
+        hh115           442.0       7110.0                 1.865
+pelt    hh113            68.0       7088.0                 0.288
+        hh115            76.0       7110.0                 0.321
+zscore  hh113           785.0       7088.0                 3.323
+        hh115           783.0       7110.0                 3.304
+
+=== calibrated thresholds (target 0.5 false alarms / 30 days on normal runs): {'zscore': 4.488, 'iforest': 0.582, 'pelt': 0.634}
+episode detection:
+                            episodes    recall  median_delay_days
+method  condition  persona                                       
+iforest cognitive  hh113           8       1.0                8.0
+                   hh115           8       1.0               29.0
+        depression hh113           8       1.0                6.0
+                   hh115           8     0.375               23.0
+        uti        hh113          19  0.526316                3.0
+                   hh115          19  0.315789                6.5
+pelt    cognitive  hh113           8       0.5               21.0
+                   hh115           8      0.75               19.5
+        depression hh113           8     0.375                5.0
+                   hh115           8     0.375               17.0
+        uti        hh113          19  0.105263               -0.5
+                   hh115          19  0.157895                1.0
+zscore  cognitive  hh113           8       1.0               53.5
+                   hh115           8       1.0               48.0
+        depression hh113           8       0.5               21.0
+                   hh115           8      0.75               16.5
+        uti        hh113          19  0.789474                2.0
+                   hh115          19  0.315789                7.5
+false alarms on normal days (alarm onsets per 30 days):
+                 false_alarms  normal_days  false_alarms_per_30d
+method  persona                                                 
+iforest hh113           168.0       7088.0                 0.711
+        hh115           110.0       7110.0                 0.464
+pelt    hh113            62.0       7088.0                 0.262
+        hh115            53.0       7110.0                 0.224
+zscore  hh113           105.0       7088.0                 0.444
+        hh115           127.0       7110.0                 0.536
+
+PELT onset dating (nearest change point - true onset, days):
+                    median_error  median_abs_error  within_7_days
+condition  persona                                               
+cognitive  hh113            -3.0               7.0           0.50
+           hh115             5.5               8.5           0.50
+depression hh113             3.5               5.5           0.75
+           hh115             5.0               7.0           0.75
+uti        hh113             0.0               2.0           0.68
+           hh115            -2.0               6.0           0.63
