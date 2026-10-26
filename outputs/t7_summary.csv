@@ -1,0 +1,5 @@
+setting,train,test,day_macro_F1
+within-persona (GroupKFold by run),hh113,hh113,0.681
+within-persona (GroupKFold by run),hh115,hh115,0.58
+cross-persona,hh113,hh115,0.58
+cross-persona,hh115,hh113,0.591

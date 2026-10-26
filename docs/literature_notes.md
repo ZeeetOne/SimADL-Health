@@ -155,6 +155,11 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 ### Liu F. T., Ting K. M., Zhou Z.-H., 2008 — *Isolation Forest*, ICDM — `MEMORY` — T6
 - Unsupervised anomaly score from average path length in random isolation trees (scikit-learn `IsolationForest`).
 
+### Lundberg S., Lee S.-I., 2017 — *A unified approach to interpreting model predictions* (SHAP), NeurIPS — `MEMORY` — T7, T8
+- Shapley-value feature attributions. TreeExplainer (Lundberg et al., 2020, Nature Machine Intelligence) gives exact values for tree ensembles. Used to explain per-condition predictions to the clinician.
+
+### Breiman L., 2001 — *Random Forests*, Machine Learning 45 — `MEMORY` — T5, T7
+
 ### Ugwu, Fritz, Cook, Doppa — clinician-in-the-loop UTI recurrence (AAAI) — `MEMORY` — T8
 - Clinically relevant behavioural markers from ambient sensors. Reference for the clinician-facing report format.
 
