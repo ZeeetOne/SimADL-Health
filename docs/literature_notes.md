@@ -261,6 +261,47 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 
 ---
 
+## Real-world deployments and edge computing
+
+### Montreal AAL single-case study — *Using ambient assisted living to monitor older adults with Alzheimer disease: single-case study to validate the monitoring report*, JMIR Aging 2020 — `READ` — T8 (key for report period)
+- Links: https://pmc.ncbi.nlm.nih.gov/articles/PMC7695528/ · https://pubmed.ncbi.nlm.nih.gov/33185555/
+- 91-year-old woman with AD living alone, public home care (CLSC), Montreal. 490 days of monitoring.
+- **Monthly report emailed to the care professional** ("frequent enough"). Periods of **35 days = 5 of each weekday**. **First month = baseline**, compared month by month with linear mixed models (month, weekday). Cooking/hygiene events flagged at 2 SD above the person's mean.
+- Content: last month's activity timing, room-time pie chart, daily time in sleep / outings / low mobility / cooking / hygiene, stove and microwave use, trend lines with significant periods shaded, table of means and 95 % CI.
+- Validated by triangulating with the medical file, 4 nurse interviews and ~20 phone memos. The reports showed changes the nurse had not noticed (sleep +22 %, time outside −68 %, cooking −53 %, hygiene −30 %).
+- Limitations: single case, cannot tell occupants apart, sleep vs lying in bed, hygiene inferred from bathroom time.
+
+### DomoCare — 12-month study, weekly activity graphs to nurses — `SNIPPET`
+- Seen via search snippets around PMC7695528 / PMC7373719 (*Potential of ambient sensor systems for early detection of health problems in older adults*, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7373719/). Weekly graphs were emailed when activity deviated. 76 % (95 % CI 61–87) favourable to ambient sensors.
+
+### MinderCare (UK DRI / Imperial / NHS North West London) — `SNIPPET`
+- Links: https://www.isrctn.com/ISRCTN14997677 · https://thiis.co.uk/new-nhs-home-monitoring-service-launched-to-improve-care-for-patients-with-dementia/ · https://ukdri.ac.uk/node/1121
+- Successor of TIHM. Alerts are first checked by a monitoring team for technical errors, then escalated to the clinical team. **Regular "Minder Reports" summarising data and alerts** go to the clinical team, or on request to the GP / consultants. Pilot in ~100 homes, 4-person clinical team, based at St Charles Hospital virtual hospital.
+
+### Sensara (NL) — `SNIPPET`
+- Links: https://digitalhealthuptake.eu/radar-repository/sensara-a-sensor-technology-for-nursing-home-rooms/ · https://www.overons.kpn/en/news/2019/kpn-ventures-expands-investment-in-sensara
+- TNO spin-off (2013). Camera-free sensors and a self-learning algorithm for individual patterns. Deviations (e.g. more night activity, bathroom changes) are pushed as notifications to carers or family. Home-care pilots (Careyn, dementia case managers).
+
+### US Medicare remote patient monitoring — CPT 99454 / 99445 (CY2026) — `SNIPPET` (vendor/legal summaries; verify against the CMS PFS final rule)
+- Links: https://med.uth.edu/mshbc/digital-health-services/remote-patient-monitoring-rpm/ · https://www.beneschlaw.com/insight/cms-proposes-comprehensive-updates-to-remote-patient-monitoring-and-remote-therapeutic-monitoring-reimbursement/pdf/
+- Billing per 30-day period. 99454 needs device data on **≥ 16 of 30 days**, and 99445 (new) covers 2–15 days. A real-world data-sufficiency rule.
+
+### Gaitán-Guerrero J. F., López J. L., Martínez-Cruz C., Díaz-Jiménez D., Espinilla M., 2025 — *Enabling local language models for IoT monitoring description via distributed low-cost hardware*, UCAmI 2025 (Springer, doi 10.1007/978-3-032-16992-1_44) — `READ` (PDF) — deployment
+- Link: https://www.ujaen.es/grupos-de-investigacion/asia/sites/investigacion_asia/files/uploads/node_trabajos/ucami2025/ucami2025_actas-477-488jgaitan.pdf
+- Distributed architecture running lightweight LLMs locally on **Raspberry Pi 4 (8 GB)** to turn sensor data into readable activity summaries, with no cloud. Validated on real activity data.
+- Small models use the hardware heavily, so **distributing tasks across devices is essential**. Prompts work better **split into focused segments**, and the model was good at aggregating partial summaries. Cites LLaMA-2-7B edge studies: tokens/s is unacceptably low on low-memory Pis, while Jetson AGX Orin is much faster.
+
+### Choi Y., Jung D., Kim H., 2025 — *DESAMO: a device for elder-friendly smart homes powered by embedded LLM with audio modality*, UIST '25 — `READ` (PDF) — deployment, POS (audio)
+- Link: https://arxiv.org/abs/2508.18918
+- Audio LLM fully on-device on **NVIDIA Jetson Orin Nano**: Whisper-large-v3 audio encoder (16-bit) + 4-bit LLM (GGUF). Voice intents plus passive detection of critical ambient events (falls, calls for help). Latency ~5.3 s (headless). Motivation: privacy, no network.
+
+### *Real-time acoustic scene recognition for elderly daily routines using edge-based deep learning* — `SNIPPET` — POS (audio)
+- Link: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11946438/ — quantised models on edge microphones; cloud audio is limited by latency and privacy.
+
+### France — HDS (Hébergement de Données de Santé) — `SNIPPET`
+- Links: https://esante.gouv.fr/faq/resultats?page=29 · https://affairesjuridiques.aphp.fr/textes/note-explicitation-du-champ-dapplication-du-cadre-juridique-de-lhebergement-de-donnees-de-sante-ministere-de-la-sante-represente-par-la-delegation-la-strategie-des-s/telecharger/629195
+- Hosting personal health data for care requires an HDS-certified host. The revised framework requires storage in the EEA. Telemonitoring data counts as health data (GDPR Art. 9); this point comes from a secondary source and needs checking.
+
 ## Dataset
 
 ### CASAS smart home datasets — Zenodo record 15708568 — `READ`

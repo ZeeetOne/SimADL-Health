@@ -55,6 +55,31 @@ Gaps compared with prior work:
 3. There is no evaluation by clinicians. Ugwu used a 42-nurse Likert survey and PH-LLM used expert rubrics.
 4. LLM verbalisation is optional future work. If used, it should only rephrase the computed facts, with each sentence checked against them (Fiori et al. mitigation).
 
+## Real-world deployments: report period, data sufficiency, where computation runs
+
+| System | Status | Where it runs | What is produced, for whom, how often | Reference period |
+|---|---|---|---|---|
+| **MinderCare** (UK DRI / NHS North West London Virtual Hospital) | NHS pilot, ~100 homes, 4-person clinical monitoring team | Back-end servers | Alerts checked by a monitoring team, then a clinical team. **Regular "Minder Reports"** summarising data and alerts go to the clinical team, **or to the GP on request** | n/a |
+| **TIHM for Dementia** (NHS Surrey) | RCT, 408 people with dementia | Back-end; ML on integrated data | Alerts prioritised and colour-coded on a dashboard watched 24/7; the team phones the carer | n/a |
+| **Sensara** (NL, TNO spin-off, 2013) | Commercial (home care, nursing homes) | Cloud | Self-learning per-person patterns, deviation notifications to carers / family | person's own learned pattern |
+| **Montreal AAL single case** (JMIR Aging 2020, PMC7695528) | Public home-care service, 490 days | Custom sensors + server | **Monthly report emailed to the care professional.** 490 days were split into **14 periods of 35 days (5 of each weekday)**. Sleep, outings, low mobility, cooking, hygiene, appliance use; trend lines with significant periods shaded; table of means and 95 % CI | **First monitoring month = baseline.** Linear mixed models (month, weekday). Events flagged at 2 SD above the person's mean |
+| **DomoCare** (12-month study) | Research | Server | **Weekly activity graphs** emailed to nurses when activity deviated. 76 % favourable to ambient sensors | n/a |
+| **Community-in-the-loop** (JMIR Aging 2026) | 46 older adults, 6 months | Server, rules | Email/SMS alerts, then a CHW phone call; 4,719 alerts, 93 % needed no action | the person's established routine |
+| **US Medicare RPM** (CPT 99454 / 99445, 2026) | Reimbursement rule | — | Billing per **30-day period**: 99454 requires data on **≥ 16 of 30 days**; 99445 covers 2–15 days | — (data sufficiency rule) |
+
+**Edge / local LLM evidence**
+- Deployed systems process on servers and use **no LLM**. Text is produced by clinicians or monitoring teams.
+- Gaitán-Guerrero et al., UCAmI 2025: small local LLMs on **Raspberry Pi 4 (8 GB)** can turn sensor data into readable activity summaries. Small models use the hardware heavily, so tasks had to be **distributed across devices** and **prompts split into focused segments**. Feasible but resource-bound.
+- DESAMO (UIST 2025): an audio LLM fully on **Jetson Orin Nano** (Whisper-large-v3 encoder at 16-bit, LLM at 4-bit, GGUF), with ~5.3 s latency, for voice commands and ambient events (falls, calls for help).
+- Edge acoustic scene recognition for elderly routines (PMC11946438): quantised models on device, motivated by privacy and latency.
+- France: health data is GDPR Art. 9 special-category data, and hosting personal health data for care requires an **HDS-certified host** with storage in the EEA. Keeping raw audio and processing on the device reduces what must be hosted.
+
+**Implications for SimADL-Health / ObsAVQ**
+1. **Report period.** Deployed systems report monthly (Montreal: 35-day periods of whole weeks) or weekly. A GP pre-consultation report should cover **the period since the last consultation**, or by default the last 5 whole weeks.
+2. **Reference period.** Montreal uses the first month as a fixed baseline. Our real-resident results showed that a fixed old baseline drifts out of date. Options are a fixed baseline (good for slow decline) or a rolling baseline just before the report period (robust to drift). This should be a parameter, and the report should state which one was used.
+3. **Data sufficiency.** The report should refuse or warn when the period has too few valid days. The Medicare RPM threshold (≥ 16 of 30 days) is a real-world reference.
+4. **Where to compute.** Audio → events must stay on the device for privacy, as ObsAVQ's audio sensing implies. Our features + detection + attribution are light (RF model 5.6 MB, a few seconds per person on a laptop CPU), so they can run on a home box or an HDS server. Template text needs no LLM. A local LLM is **optional**, only to rephrase verified facts, and the edge evidence shows it is feasible with small quantised models but costly.
+
 ## What changed after this review
 1. **T6 threshold leakage fixed**: thresholds are calibrated on the other home's normal runs. False alarms on the held-out
    home are 0.27–0.77 per 30 days, against a target of 0.5. Thresholds transfer only roughly between people, which argues for
