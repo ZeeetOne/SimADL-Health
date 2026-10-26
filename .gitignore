@@ -14,3 +14,6 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+# Trained models (regenerate with python -m simadl.train)
+models/

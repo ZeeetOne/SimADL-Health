@@ -6,3 +6,4 @@ matplotlib
 ruptures
 shap
 jupyter
+joblib

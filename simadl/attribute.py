@@ -34,22 +34,29 @@ MIN_SEVERITY = 0.5
 SHORT_FEATURES = ["night_toilet", "sleep_episodes"]
 
 
+def person_windows(person: pd.DataFrame) -> pd.DataFrame:
+    """Model inputs for one person's consecutive daily features (first BASELINE_DAYS = their baseline):
+    z (this week vs baseline), d_ (this week vs two weeks earlier), s3_ (3-day night signals)."""
+    z = weekly_signal(person)
+    dz = (z - z.shift(DELTA_DAYS)).add_prefix("d_")
+    # short 3-day window for night signals: a 4-9 day UTI is diluted in a weekly mean
+    night = person[SHORT_FEATURES].rolling(3, min_periods=2).mean()
+    base = night.iloc[:BASELINE_DAYS]
+    s3 = ((night - base.mean()) / base.std().replace(0, 1)).add_prefix("s3_")
+    x = pd.concat([z.add_prefix("z_"), dz, s3], axis=1).fillna(0.0)
+    x["t"] = np.arange(len(person))
+    return x
+
+
 def build_windows(daily: pd.DataFrame) -> pd.DataFrame:
-    """One row per day: z (this week vs baseline) and dz (this week vs two weeks earlier)."""
+    """person_windows for every simulated run, with run metadata, after the baseline period."""
     rows = []
     for run_id, run in daily.groupby("run_id", sort=False):
         run = run.reset_index()
-        z = weekly_signal(run)
-        dz = (z - z.shift(DELTA_DAYS)).add_prefix("d_")
-        # short 3-day window for night signals: a 4-9 day UTI is diluted in a weekly mean
-        night = run[SHORT_FEATURES].rolling(3, min_periods=2).mean()
-        base = night.iloc[:BASELINE_DAYS]
-        s3 = ((night - base.mean()) / base.std().replace(0, 1)).add_prefix("s3_")
-        x = pd.concat([z.add_prefix("z_"), dz, s3], axis=1)
+        x = person_windows(run)
         x[["run_id", "persona", "day", "label", "severity"]] = run[["run_id", "persona", "day", "label", "severity"]]
-        x["t"] = np.arange(len(run))
         rows.append(x.iloc[BASELINE_DAYS:])
-    return pd.concat(rows, ignore_index=True).fillna(0.0)
+    return pd.concat(rows, ignore_index=True)
 
 
 def training_rows(w: pd.DataFrame) -> pd.DataFrame:
