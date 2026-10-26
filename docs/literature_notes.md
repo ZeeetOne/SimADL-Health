@@ -33,6 +33,37 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 - UTI symptoms in older adults are often **atypical** (confusion, dizziness, falls), not just urinary frequency.
 - Likely related to Ugwu, Fritz, Cook, Doppa (AAAI), the reference for the T8 report format.
 
+### Ugwu C. E., Fritz R., Cook D. J., Doppa J. R., 2026 — *Clinician-in-the-loop smart home system to detect UTI flare-ups via uncertainty-aware decision support*, AAAI 40 — `READ` (arXiv HTML) — T8 (key), T3
+- Links: https://arxiv.org/html/2511.18334v1 · https://ojs.aaai.org/index.php/AAAI/article/view/41490
+- 117 labelled days, 8 smart homes. From 17 candidate features, 5 kept by SHAP: **nocturnal bathroom visits, nocturnal non-bathroom movement, % of bathroom visits at night**, health event in last 3 days, daily movement entropy.
+- Logistic regression + **Conformal-Calibrated Interval** (α = 0.1). The model **abstains** ("I don't know") when the interval crosses 0.5. CCI: acc 0.72, precision 0.74, recall 0.78, F1 0.75, abstention 22 %.
+- Output shown to nurses: 0–1 risk plots (green no-UTI, red UTI, purple interval). **42 nurses**, 6 seven-point Likert items (clarity, confidence, trust, decision influence, communication, workflow fit): CCI plots were mostly agree / strongly agree. Nurses asked for the contributing factors to be shown. Perceived usefulness only, no outcomes.
+- (This supersedes the earlier SNIPPET entry for arXiv 2511.18334 under UTI.)
+
+### Community-in-the-loop smart home monitoring for aging in place, JMIR Aging 2026 — `READ` — T8
+- Links: https://pmc.ncbi.nlm.nih.gov/articles/PMC13395425/ · https://doi.org/10.2196/88290
+- 46 older adults, 6 months. 37M sensor readings → 1.2M events → **4,719 alerts**. A rules-based algorithm compares recent behaviour to the person's own routine, with 6 alert types (social isolation, decreased daytime activity, kitchen use, decreased bathing, sleep disturbance, changed sleep pattern).
+- Email/SMS escalation, then community health worker phone call. 93 % of alerts needed no action, and there were 72 interventions. Response to automated messages was low (1.6–7.8 %), and phone calls were preferred. NPS +55.
+- Lessons: merge overlapping alerts, suppress repeats, transparent logic, **say that no alert ≠ clinically stable**, non-judgemental wording, human-voice routing.
+
+### TIHM for Dementia (NHS Surrey) — dashboard alerts — `SNIPPET` — T8
+- Links: https://longtermplan.nhs.uk/case-studies/technology-integrated-health-management · https://eprints.soton.ac.uk/483625 · trial ISRCTN46184518
+- ML alerts (incl. UTI, wandering, dehydration) are prioritised and **colour-coded on a dashboard** (red = urgent, siren for highest), watched 24/7 by a monitoring team that phones the carer first. RCT with 408 people with dementia.
+
+### Fiori M., Civitarese G., Choudhary P., Bettini C., 2025 — *Leveraging LLMs for explainable activity recognition in smart homes: a critical evaluation*, ACM Trans. IoT — `READ` (PDF) — T8
+- Link: https://arxiv.org/abs/2503.16622
+- LLMs turn a structured textual representation of sensor data into explanations, with zero-shot recognition (LLMe2e) or explaining another model (LLMExplainer). Users rated the explanations higher than heuristic/template explanations.
+- **Main risk: over-reliance.** Linguistically good explanations that the sensor data do not support, including convincing explanations for wrong predictions ("illusion of certainty"). Hallucinations are also discussed.
+- Mitigations: isolate transitions, and use **an agent that verifies each rationale is supported by the data**. Future work with neurologists on MCI homes.
+
+### Cosentino J. et al. (Google), 2025 — *Towards a personal health large language model* (PH-LLM), Nature Medicine — `SNIPPET` — T8
+- Link: https://arxiv.org/abs/2406.06474 — Gemini fine-tuned on wearable sleep/fitness data. 857 expert-written case studies, near-expert on fitness. **Rubrics for long-form answers**: domain knowledge, use of user data, personalisation, potential harm.
+
+### Kim Y. et al., 2024 — *Health-LLM: LLMs for health prediction via wearable sensor data* — `SNIPPET` — T8
+- Link: https://arxiv.org/abs/2401.06866 — 12 LLMs on 10 consumer health tasks. Case study shows false / hallucinated reasoning.
+
+### Civitarese G. et al., 2024 — *LLMs are zero-shot recognizers for activities of daily living* (arXiv 2407.01238) — `SNIPPET` — POS (audio/sensor → events layer)
+
 ### Enshaeifar S. et al., 2019 — TIHM for Dementia, PLoS ONE 14(1): e0209909 — `SNIPPET` — T6
 - Links: https://eprints.gla.ac.uk/217130 · https://doaj.org/article/6cfaad9dcb14471abff0cccdbace6e84
 - IoT + in-home sensors (PIR etc.) in more than 150 homes of people with dementia. NMF latent factors → clustering to flag possible UTIs.

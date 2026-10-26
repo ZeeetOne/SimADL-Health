@@ -32,6 +32,29 @@ Verdicts: ✅ consistent with prior work · ⚠️ deviation, justified or ackno
 | **T8 Report** | Template FR/EN report: per-ADL summary vs habits, 90-day chart, detected periods, hypothesis + confidence + behaviours that changed; "not a diagnosis". | Cejudo: flagged days presented as prompts for clinical follow-up, not diagnoses. Fritz / Ugwu: clinician-in-the-loop, deviations from the person's baseline. | ✅ |
 | **T9 Evaluation** | Synthetic test (held-out runs, unseen persona) + qualitative run on 2 real residents without labels. | Tanaka: trains and tests on simulation only, and states that validity depends on simulation realism. Isudra: real nurse-labelled events, low absolute G-mean (≈0.05–0.4). | ⚠️ Same limitation as Tanaka. Our real-resident run already shows a sim-to-real gap (long "cognitive" periods). Isudra's low real-data scores warn that synthetic results are optimistic. |
 
+## Report generation (T8): how prior work presents results to clinicians
+
+No published work found (Oct 2026) that turns ambient smart-home data into a **narrative pre-consultation report for a GP**.
+That gap is ObsAVQ's own objective. Prior systems present results in four ways:
+
+| Approach | Example | What the clinician gets | Lessons |
+|---|---|---|---|
+| Rule / threshold alerts vs personal routine | Community-in-the-loop prototype, JMIR Aging 2026 (46 older adults, 6 months); TIHM for Dementia (NHS, 408 people) | Alerts by email/SMS or on a colour-coded, priority-ranked dashboard watched by a monitoring team | 4,719 alerts and 93 % needed no action, so alert fatigue is a problem: merge overlapping alerts and suppress repeats. Make the logic and thresholds transparent. **State that "no alert" does not mean clinically stable.** Use non-judgemental wording. |
+| ML risk score + calibrated uncertainty + abstention | Ugwu, Fritz, Cook, Doppa, AAAI 2026 (UTI flare-ups, 8 homes) | Daily probability with a conformal interval, and "UTI / no UTI / **I don't know**" when uncertain | 42 nurses rated the calibrated-interval plots positively for clarity, trust, decision influence and workflow fit. Nurses **asked to see the contributing factors**. Features were chosen with SHAP. |
+| Statistical deviation + "what changed" explanation | Cejudo et al. 2025 | Flagged days plus the activities outside the boxplot range | Presented as prompts for clinical follow-up, not diagnoses. |
+| LLM-written explanations | Fiori, Civitarese, Choudhary, Bettini 2025 (ACM TIoT); PH-LLM (Nature Medicine 2025); Health-LLM 2024 | Natural-language explanations or insights | Users rated LLM explanations higher than template/heuristic ones. **Main risk is over-reliance**: convincing explanations for wrong predictions and rationales not supported by the data. Proposed mitigations: give the LLM a structured textual representation of the data, check every rationale against the data (e.g. a verifier agent), and evaluate with expert rubrics (PH-LLM). |
+
+**Where SimADL-Health stands:** our T8 pipeline (trained models → computed facts → template text) belongs to the
+"risk score + explanation" family. It already shows the contributing behaviours that nurses asked for in Ugwu et al., and it
+is a "decision support, not diagnosis" report like Cejudo et al. Using templates instead of an LLM is the safe choice the
+literature supports for clinical text.
+
+Gaps compared with prior work:
+1. Our confidence is a raw random-forest probability, with no calibrated uncertainty and no explicit abstention (Ugwu: conformal + "I don't know").
+2. The report does not say that "no detected change ≠ clinically stable" (community-in-the-loop lesson).
+3. There is no evaluation by clinicians. Ugwu used a 42-nurse Likert survey and PH-LLM used expert rubrics.
+4. LLM verbalisation is optional future work. If used, it should only rephrase the computed facts, with each sentence checked against them (Fiori et al. mitigation).
+
 ## What changed after this review
 1. **T6 threshold leakage fixed**: thresholds are calibrated on the other home's normal runs. False alarms on the held-out
    home are 0.27–0.77 per 30 days, against a target of 0.5. Thresholds transfer only roughly between people, which argues for
