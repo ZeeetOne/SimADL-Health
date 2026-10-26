@@ -52,6 +52,8 @@ def estimate_params(home: str) -> dict:
         p = {}
         p["sleep_onset"] = _stats(part["sleep_onset_h"])
         p["wake"] = _stats(part["wake_h"])
+        p["sleep_onset_z"] = _residuals(part["sleep_onset_h"])
+        p["wake_z"] = _residuals(part["wake_h"])
         p["night_toilet"] = _stats(part["night_toilet"])
         frag = part[part["sleep_episodes"] > 1]
         gap_h = (frag["wake_h"] - frag["sleep_onset_h"] - frag["sleep_hours"]) / (frag["sleep_episodes"] - 1)
@@ -62,6 +64,7 @@ def estimate_params(home: str) -> dict:
         for slot in SLOTS:
             p[f"{slot}_p"] = float(part[f"{slot}_h"].notna().mean())
             p[f"{slot}_h"] = _stats(part[f"{slot}_h"], default_mean={"breakfast": 8, "lunch": 12.5, "dinner": 18}[slot])
+            p[f"{slot}_h_z"] = _residuals(part[f"{slot}_h"])
         p["episodes_per_meal"] = float((part["meal_episodes"] / part["meals"].where(part["meals"] > 0)).mean())
         p["outings"] = _stats(part["outings"])
         p["time_out_mean"] = float(part["time_out_h"].mean())  # baselines used by T4 to size changes
@@ -97,8 +100,17 @@ def estimate_params(home: str) -> dict:
     return params
 
 
-def _normal(rng, ms, lo=-np.inf, hi=np.inf):
-    return float(np.clip(rng.normal(ms[0], ms[1]), lo, hi))
+def _residuals(x: pd.Series, min_n: int = 20) -> list:
+    """Standardised residuals of a real feature, so sampling keeps its real shape (skew, peaks)."""
+    x = x.dropna()
+    return ((x - x.mean()) / x.std()).round(3).tolist() if len(x) >= min_n else []
+
+
+def _normal(rng, ms, lo=-np.inf, hi=np.inf, z=None):
+    """mean + std * noise; noise is a resampled real residual when available, else standard normal.
+    Keeping (mean, std) explicit lets T4 shift and widen the distribution without losing its shape."""
+    noise = rng.choice(z) if z else rng.normal()
+    return float(np.clip(ms[0] + ms[1] * noise, lo, hi))
 
 
 def _count(rng, ms):
@@ -149,7 +161,7 @@ def _daytime_blocks(rng, p, params, day):
     blocks = []
     slots = [s for s in SLOTS if rng.random() < p[f"{s}_p"]]
     # sorted so that breakfast < lunch < dinner even when sampled times cross
-    times = sorted(_normal(rng, p[f"{s}_h"], 0, 23.9) for s in slots)
+    times = sorted(_normal(rng, p[f"{s}_h"], 0, 23.9, p[f"{s}_h_z"]) for s in slots)
     for slot, hour in zip(slots, times):
         blocks.append((0, day + pd.Timedelta(hours=hour), _meal_parts(rng, p, dur, slot)))
     if slots and rng.random() < p["repeat_meal_p"]:
@@ -202,13 +214,13 @@ def simulate(params: dict, n_days: int, seed: int = 0, start: str = START_DATE, 
     days = pd.date_range(start, periods=n_days, freq="D")
     eps = []
     first = params["weekend" if days[0].day_of_week >= 5 else "weekday"]
-    awake_from = days[0] + pd.Timedelta(hours=_normal(rng, first["wake"]) - 24)
+    awake_from = days[0] + pd.Timedelta(hours=_normal(rng, first["wake"], z=first["wake_z"]) - 24)
     for i, day in enumerate(days):
         p = dict(params["weekend" if day.day_of_week >= 5 else "weekday"])
         if modifier is not None:
             p = modifier(i, day, p)
-        onset = day + pd.Timedelta(hours=_normal(rng, p["sleep_onset"], 19, 28))
-        wake = day + pd.Timedelta(hours=_normal(rng, p["wake"], 26, 36))
+        onset = day + pd.Timedelta(hours=_normal(rng, p["sleep_onset"], 19, 28, p["sleep_onset_z"]))
+        wake = day + pd.Timedelta(hours=_normal(rng, p["wake"], 26, 36, p["wake_z"]))
         if wake - onset < pd.Timedelta(hours=2):
             wake = onset + pd.Timedelta(hours=2)
         eps += _place(_daytime_blocks(rng, p, params, day), awake_from + pd.Timedelta(minutes=15),

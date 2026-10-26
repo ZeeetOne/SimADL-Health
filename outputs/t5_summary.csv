@@ -1,0 +1,7 @@
+pair,kind,n_a,n_b,mean_KS_D,discriminator_AUC
+sim hh113 vs real hh113 calibration,fit,2912,347,0.078,0.888
+sim hh113 vs real hh113 holdout,test,2912,142,0.188,0.951
+sim hh115 vs real hh115,fit,2912,292,0.069,0.643
+real hh113 calibration vs holdout,reference,347,142,0.199,0.882
+real hh113 vs real hh115,reference,489,292,0.379,0.994
+sim hh113 vs real hh115,reference,2912,292,0.334,0.989

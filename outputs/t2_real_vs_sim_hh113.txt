@@ -1,16 +1,16 @@
-hh113: simulated 7136 episodes over 364 days
+hh113: simulated 7140 episodes over 364 days
                 real_mean  sim_mean  real_std  sim_std
-sleep_onset_h       22.71     22.72      0.93     0.92
-wake_h              31.17     31.05      0.75     0.77
-sleep_hours          7.90      8.19      1.80     1.27
-sleep_episodes       1.49      1.46      0.69     0.64
+sleep_onset_h       22.71     22.65      0.93     0.80
+wake_h              31.17     31.10      0.75     0.76
+sleep_hours          7.90      8.30      1.80     1.22
+sleep_episodes       1.49      1.46      0.69     0.63
 night_toilet         0.26      0.30      0.49     0.48
-meals                1.34      1.32      0.71     0.70
-meal_episodes        8.18      8.50      4.69     5.26
-breakfast_h         11.09     11.18      1.11     1.12
-dinner_h            16.85     16.84      0.62     0.72
-outings              3.47      3.24      1.30     1.34
-time_out_h           6.09      5.36      2.06     2.79
-phone_calls          2.06      2.08      2.03     1.76
-guest_visits         0.61      0.60      1.18     1.02
-guest_h              0.39      0.34      1.10     0.80
+meals                1.34      1.38      0.71     0.73
+meal_episodes        8.18      8.73      4.69     5.76
+breakfast_h         11.09     11.09      1.11     1.06
+dinner_h            16.85     16.85      0.62     0.63
+outings              3.47      3.21      1.30     1.29
+time_out_h           6.09      5.12      2.06     2.67
+phone_calls          2.06      1.97      2.03     1.60
+guest_visits         0.61      0.57      1.18     0.96
+guest_h              0.39      0.28      1.10     0.62
