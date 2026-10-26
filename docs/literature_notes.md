@@ -126,11 +126,67 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 
 ## Smart-home health events, anomaly detection, simulation (from the project plan)
 
+### Tanaka K. et al., 2023 — *Sensor data simulation for anomaly detection of the elderly living alone* (arXiv 2312.16852) — `READ` — T2, T3, T4, T5
+- Links: https://arxiv.org/html/2312.16852v1 · code public · PhD thesis (Hokkaido 2025): https://eprints.lib.hokudai.ac.jp/repo/huscap/all/94927/Kai_Tanaka_review.pdf
+- Normal day is filled in three passes. Fundamental activities (sleep, breakfast) have normal start/duration. Necessary activities (urination, teeth) have Poisson daily count and normal duration. Random activities have occurrence probabilities. Parameters come from a Japanese time-use survey.
+- Anomalies: wandering, forgetting and falls have frequency/duration as functions of a latent **MMSE** (29 → 19.5 linearly over 9 years, rate from literature). **Semi-bedridden** (~once / 20 months, ~30 days, +40-min nap, more rest) and **housebound** (~once / 10 months, ~14 days, **fewer outings and phone calls**) are fixed and independent of MMSE.
+- Realism: no comparison with real anomalies. Normal sequences are compared by a Levenshtein day-to-day similarity vs Kasteren (24 d) and CASAS Aruba (74 d test).
+- Many coefficients are assumed (linear MMSE coefficients, SD = D/5, fixed frequencies).
+
+### Tanaka K. et al., 2024 — *Long-term detection system for six kinds of abnormal behavior of the elderly living alone* (arXiv 2411.13153) — `READ` — T6, T7, T9
+- Link: https://arxiv.org/html/2411.13153v1
+- 5 m × 12 m studio, 41 binary sensors. **Train on 9 simulated years, test on 9 other simulated years. No real data**, which is stated as future work.
+- Semi-bedridden / housebound: daily sleep duration and going-out frequency vs **mean ± c·σ over consecutive days** (c chosen to maximise F1 on training data). Forgetting: decision tree on 2-hour windows. Falls while walking: random forest. Wandering: HMM / dynamic naive Bayes.
+- Metrics: **sensitivity = share of true anomaly intervals overlapping any detected interval; false alarm rate = detected intervals with no overlap, per day.** Plus mean alarm length.
+- Results (simulated test): semi-bedridden sens 1.0 / FAR 0; housebound 1.0 / 0.004 per day; forgetting 1.0 / 0.01; wandering 1.0 / 0.017; walking fall 0.75 / 0.02; standing fall 0.92 / 0.
+- Limitation stated: "validity depends on the realism of the simulation". Only one layout and one resident profile.
+
+### Dahmen J., Cook D., 2019 — *SynSys: a synthetic data generation system for healthcare applications*, Sensors 19(5): 1181 — `READ` — T1, T2, T5
+- Link: https://pmc.ncbi.nlm.nih.gov/articles/PMC6427177/
+- 10 CASAS homes of older adults (1–2 residents). Labels from an activity recogniser trained on annotations. "Other Activity" is split into 12 K-means clusters.
+- Generator: 12-state HMM for the activity sequence (reset each hour to the most probable activity), per-activity HMM for sensor events, ridge regression for durations and inter-event gaps (features: activity, time of day, day of week, states).
+- Realism: Euclidean and DTW distance between one real week and one generated week, averaged over 10 homes. SynSys–real 1474 / 194,011 vs random 2048 / 364,392, another home 1799 / 302,221, another time period 1781 / 311,438, simple HMM + Poisson 1846 / 310,964 (all p < 0.05).
+- Downstream: semi-supervised activity recognition improves with synthetic data (e.g. 5k real events: 35.5 % → 47.9 %).
+- Future work stated: use SynSys to generate normal and outlier data for health-event detection, which is what our project does.
+
+### Dahmen J., Cook D., 2021 — Isudra, ACM TIST 12(2) — `READ` (PMC8323613) — T6
+- Link: https://pmc.ncbi.nlm.nih.gov/articles/PMC8323613/
+- 5 CASAS homes, 1 older adult each with chronic conditions, ≥6 months, ~25 sensors; 2,287,859 sensor events; **26 nurse-labelled health events** with start/end, confirmed by residents.
+- Windows of 10–150 sensor events. Feature groups: sensor, activity, baseline, location, bathroom usage, social/sleep. Detectors: PCA, iForest, KNN, LOF, OCSVM, chosen with hyperparameters by Bayesian optimisation (TPE, 30 iterations) guided by a few labelled events.
+- G-mean (written as precision × recall): fall 0.047, **nocturia 0.064**, depression-not-sleeping-well 0.115, **depression-less-time-out-of-home 0.412**, depression-slower-walking 0.047, depression-more-time-in-chair 0.184, weakness 0.062. iForest baseline is roughly half of these.
+- **Real-data detection scores are low**, which warns that our synthetic scores are optimistic.
+
+### Dahmen J., 2019 — PhD thesis *Automated health event detection in smart homes* (WSU) — `SNIPPET`
+- Link: https://rex.libraries.wsu.edu/esploro/outputs/doctoral/Automated-Health-Event-Detection-in-Smart/99900890526801842
+- Introduces a synthetic data technique with realistic synthetic health events. The abstract does not describe how it works, so the full text is still `TODO`.
+
+### Sprint G., Cook D., Fritz R., Schmitter-Edgecombe M., 2016 — *Detecting health and behavior change by analyzing smart home sensor data* (SMARTCOMP) / *Using smart homes to detect and analyze health events* (IEEE Computer) — `SNIPPET` — T6
+- Links: https://pure.gonzaga.edu/p/en/research-outputs/detecting-health-and-behavior-change-by-analyzing-smart-home-sens · https://pure.gonzaga.edu/p/en/research-outputs/using-smart-homes-to-detect-and-analyze-health-events
+- Behaviour-change detection: compare activity timing/duration between time windows, test significance, characterise the change. Two older-adult cases (cancer treatment, insomnia), with changes consistent with the medical literature.
+
+### Cejudo A. et al., 2025 — *Smart home-assisted anomaly detection system for older adults: a deep learning approach with a comprehensive set of daily activities* — `READ` — T6, T8
+- Link: https://pmc.ncbi.nlm.nih.gov/articles/PMC12106144/
+- 30 CASAS single-resident homes, 41 activities as a % of the day, ~60 days per user. Per user, the first 70 % of days are used for training.
+- Day flagged if next-day prediction error z-score is above a threshold AND some activity is outside the population boxplot whiskers (which explains *what* changed). AttentionRNN, 15-day window best.
+- No labels, so evaluation is by prediction error and qualitative examples, presented as prompts for clinical follow-up, not diagnoses.
+- Related-work table: many studies use **simulated anomalies** (Arifoglu & Bouchachia 2017, Parvin 2019, Yahaya 2019, Nazerfard 2021) or boxplot proxies. Few have clinical events (Bijlani 2022 dementia, recall 84.3 %; Isudra; Sprint 2016).
+
+### Alshammari T. et al., 2018 — *SIMADL: Simulated activities of daily living dataset*, Data 3(2): 11 — `READ` — T4 (contrast)
+- Links: https://www.mdpi.com/2306-5729/3/2/11 · dataset https://doi.org/10.5281/zenodo.1185172
+- OpenSHS virtual home, 29 binary sensors, 7 participants, 84 files (~63 days). Anomalies were **defined and acted out by the participants themselves** ("no restrictions were imposed by the researcher"), so they are subjective and not clinically grounded.
+
+### Llumiguano H. et al., 2025 — *Synthetic anomaly test sets from CASAS Aruba and HHL120* (Zenodo 15800764) and *Miratar dataset, 50 households with synthetic anomalies* (Zenodo 15800926) — `SNIPPET`
+- Links: https://zenodo.org/records/15800764 · https://zenodo.org/records/15800926
+- Anomalies injected per home area, with day-level ground truth. The injection method is not described on the record page. These could serve as an external benchmark.
+
+### You W. et al., 2025 — ADLGen (arXiv 2505.17987) — `SNIPPET`
+- Link: https://arxiv.org/abs/2505.17987v1 — preprint. Claims gains in statistical fidelity, semantic richness and downstream activity recognition over baseline generators. Metrics are not visible from the abstract (the full PDF was too large to fetch).
+
 ### Fritz R., Wuestney K., Dermody G., Cook D., 2022 — *Nurse-in-the-loop smart home detection of health events*, Int J Nursing Studies Advances — `SNIPPET` — T3, T8
 - Link: https://doaj.org/article/3a707206d43d420dbc2ed2753fd107ad
 - 25 homes. Cases: 2 CHF exacerbations, 1 UTI, 2 bowel-inflammation flares, 4 sleep interruption. Health events aligned with **changes from the person's own baseline** in sensor-derived behaviour.
 
-### Dahmen J., Cook D., 2021 — *Indirectly supervised anomaly detection of clinically meaningful health events from smart home data (Isudra)*, ACM TIST 12(2) — `MEMORY` — T6
+### Dahmen J., Cook D., 2021 — *Indirectly supervised anomaly detection… (Isudra)* — see the READ entry above — T6
 - Link: https://ir.webis.de/anthology/2021.tist_journal-ir0anthology0volumeA12A2.4
 - Validated on more than 2M sensor readings from 5 homes with 26 health events (falls, nocturia, depression, weakness). Beats supervised and unsupervised baselines.
 
@@ -140,7 +196,7 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 ### Dahmen J., Cook D., 2019 — *SynSys*, Sensors 19(5): 1181 — `MEMORY` — T2, T5
 - HMM-based synthetic smart-home data trained on real homes. Realism measured by time-series distance vs random data, other homes and other periods.
 
-### Alshammari T. et al., 2018 — *SIMADL*, Data — `MEMORY` — T4
+### Alshammari T. et al., 2018 — SIMADL — see the READ entry above
 - Simulated ADL dataset with injected anomaly patterns. Dataset is on Zenodo.
 
 ### Tanaka et al. — simulator-based detection of typical anomalies — `MEMORY` — T7
@@ -163,7 +219,7 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 ### Ugwu, Fritz, Cook, Doppa — clinician-in-the-loop UTI recurrence (AAAI) — `MEMORY` — T8
 - Clinically relevant behavioural markers from ambient sensors. Reference for the clinician-facing report format.
 
-### You W. et al. — *ADLGen* — `MEMORY` — POS (cited in the ObsAVQ project description)
+### You W. et al. — *ADLGen* — see the SNIPPET entry above — POS (cited in the ObsAVQ project description)
 - Code: https://github.com/wyou-uga/ADLGen — decoder-only Transformer with symbolic temporal encoding, context/layout-aware sampling, and an LLM generate–evaluate–refine loop.
 
 ### Bouchabou D., Nguyen S. M., Lohr C., LeDuc B., Kanellos I., 2021 — HAR survey, Sensors 21: 6037 — `MEMORY` — POS

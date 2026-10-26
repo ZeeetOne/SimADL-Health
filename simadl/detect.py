@@ -194,11 +194,15 @@ def main() -> None:
 
     for setting in ("default", "calibrated"):
         if setting == "calibrated":
-            thresholds = calibrate(scores)
-            for m in METHODS:
-                scores[f"{m}_alarm"] = scores[f"{m}_score"] > thresholds[m]
-            print(f"\n=== calibrated thresholds (target {TARGET_FA_PER_30D} false alarms / 30 days on normal runs):",
-                  {m: round(t, 3) for m, t in thresholds.items()})
+            # thresholds for one home are calibrated on the OTHER home's normal runs, so the false alarms
+            # we report are measured on data the threshold never saw (train/test separation, as in Tanaka et al.)
+            for persona, other in (("hh113", "hh115"), ("hh115", "hh113")):
+                thresholds = calibrate(scores[scores["persona"] == other])
+                rows = scores["persona"] == persona
+                for m in METHODS:
+                    scores.loc[rows, f"{m}_alarm"] = scores.loc[rows, f"{m}_score"] > thresholds[m]
+                print(f"\n=== {persona}: thresholds calibrated on {other} normal runs "
+                      f"(target {TARGET_FA_PER_30D} false alarms / 30 days):", {m: round(t, 3) for m, t in thresholds.items()})
         else:
             print("=== default thresholds (zscore 2 sigma, iforest 99th pct of baseline, pelt RMS z > 1)")
         episodes, false_alarms = evaluate(scores, labels)

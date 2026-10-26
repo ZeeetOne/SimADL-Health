@@ -30,37 +30,39 @@ pelt    hh113            68.0       7088.0                 0.288
 zscore  hh113           785.0       7088.0                 3.323
         hh115           783.0       7110.0                 3.304
 
-=== calibrated thresholds (target 0.5 false alarms / 30 days on normal runs): {'zscore': 4.488, 'iforest': 0.582, 'pelt': 0.634}
+=== hh113: thresholds calibrated on hh115 normal runs (target 0.5 false alarms / 30 days): {'zscore': 4.839, 'iforest': 0.58, 'pelt': 0.666}
+
+=== hh115: thresholds calibrated on hh113 normal runs (target 0.5 false alarms / 30 days): {'zscore': 4.164, 'iforest': 0.583, 'pelt': 0.574}
 episode detection:
                             episodes    recall  median_delay_days
 method  condition  persona                                       
 iforest cognitive  hh113           8       1.0                8.0
-                   hh115           8       1.0               29.0
+                   hh115           8       1.0               29.5
         depression hh113           8       1.0                6.0
                    hh115           8     0.375               23.0
-        uti        hh113          19  0.526316                3.0
+        uti        hh113          19  0.578947                3.0
                    hh115          19  0.315789                6.5
-pelt    cognitive  hh113           8       0.5               21.0
-                   hh115           8      0.75               19.5
+pelt    cognitive  hh113           8     0.625               26.0
+                   hh115           8     0.375               60.0
         depression hh113           8     0.375                5.0
                    hh115           8     0.375               17.0
         uti        hh113          19  0.105263               -0.5
                    hh115          19  0.157895                1.0
-zscore  cognitive  hh113           8       1.0               53.5
-                   hh115           8       1.0               48.0
-        depression hh113           8       0.5               21.0
+zscore  cognitive  hh113           8       1.0               64.5
+                   hh115           8       1.0               22.5
+        depression hh113           8     0.375               20.0
                    hh115           8      0.75               16.5
-        uti        hh113          19  0.789474                2.0
-                   hh115          19  0.315789                7.5
+        uti        hh113          19  0.789474                3.0
+                   hh115          19  0.421053                5.5
 false alarms on normal days (alarm onsets per 30 days):
                  false_alarms  normal_days  false_alarms_per_30d
 method  persona                                                 
-iforest hh113           168.0       7088.0                 0.711
-        hh115           110.0       7110.0                 0.464
-pelt    hh113            62.0       7088.0                 0.262
-        hh115            53.0       7110.0                 0.224
-zscore  hh113           105.0       7088.0                 0.444
-        hh115           127.0       7110.0                 0.536
+iforest hh113           181.0       7088.0                 0.766
+        hh115           103.0       7110.0                 0.435
+pelt    hh113            70.0       7088.0                 0.296
+        hh115            41.0       7110.0                 0.173
+zscore  hh113            64.0       7088.0                 0.271
+        hh115           174.0       7110.0                 0.734
 
 PELT onset dating (nearest change point - true onset, days):
                     median_error  median_abs_error  within_7_days
