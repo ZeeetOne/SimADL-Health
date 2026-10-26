@@ -302,6 +302,18 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 - Links: https://esante.gouv.fr/faq/resultats?page=29 · https://affairesjuridiques.aphp.fr/textes/note-explicitation-du-champ-dapplication-du-cadre-juridique-de-lhebergement-de-donnees-de-sante-ministere-de-la-sante-represente-par-la-delegation-la-strategie-des-s/telecharger/629195
 - Hosting personal health data for care requires an HDS-certified host. The revised framework requires storage in the EEA. Telemonitoring data counts as health data (GDPR Art. 9); this point comes from a secondary source and needs checking.
 
+## Clinical document formats (report output)
+
+### France — DMP / Mon espace santé document feeding (CDA, CI-SIS) — `SNIPPET` + `MEMORY`
+- Links: https://health-data-hub.fr/sites/default/files/2025-01/CDA%20%281%29%20%281%29.pdf · https://mssante.fr/documents/16106/38590/Guide_de_mise_en_oeuvre_MSSante_et_alimentationDMP_v1.0.0_20160323.pdf/29ed624d-b5e4-4e5b-947c-1ff2b013c5ac · https://www.sesam-vitale.fr/documents/d/sesam-vitale/parcours-nouvel-editeur-dmp-mars-2026
+- Professional software feeds the DMP with HL7 CDA documents defined in the ANS CI-SIS, including via MSSanté secure messaging with an attached document. Patients can upload PDFs themselves.
+- `MEMORY`, to verify: CDA R2 "niveau 1" carries a non-structured body, typically an embedded PDF. A generated PDF report could therefore be wrapped as a CDA N1 document.
+
+### HL7 FHIR DocumentReference and Personal Health Monitoring Report (PHMR) — `SNIPPET`
+- Links: https://docs.oracle.com/en/industries/health/millennium-platform-apis/mfrap/document_reference.html · https://docs.ehealth.sundhed.dk/v2.5.0/ig/OperationDefinition--s-transform-to-PHMR.html
+- FHIR `DocumentReference` indexes clinical documents of any mime type (PDF included), retrieved via `Binary`. Denmark's national eHealth infrastructure uses the HL7 **PHMR** (Personal Health Monitoring Report) for home-monitoring data, convertible to FHIR Observation and Composition.
+- Takeaway: clinical systems exchange **PDF (in CDA / DocumentReference) or structured PHMR / FHIR**, not LaTeX. SimADL-Health therefore outputs HTML for screens and an A4 PDF for exchange. LaTeX is only used for the technical paper.
+
 ## Dataset
 
 ### CASAS smart home datasets — Zenodo record 15708568 — `READ`

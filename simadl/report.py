@@ -9,6 +9,7 @@ Montreal monthly-report study) and compares it with a REFERENCE of 60 days:
   - "initial": the first 60 days of monitoring (keeps slow decline visible against the original habits)
 The long-term chart always shows the initial reference, so slow decline stays visible in both modes.
 
+Output: an HTML page (screen) and an A4 PDF (to send, print or attach to the medical record).
 Each report contains: data sufficiency (>= 16 valid days per 30, as the Medicare RPM rule), a per-ADL table,
 a long-term chart, and the change periods detected in the period with a hypothesis (or "indeterminate"),
 its confidence, the behaviours that changed, and "ongoing since <date>" when a change continues from the
@@ -69,6 +70,15 @@ DAILY_COLS = ["sleep_onset_h", "wake_h", "sleep_hours", "sleep_episodes", "night
 ADL = {"sleep": "Sleep", "eating": "Eating", "social": "Social life"}
 COND = {"uti": "urinary tract infection (nocturia)", "depression": "depressive episode",
         "cognitive": "cognitive decline"}
+# expected direction of change per condition, from docs/symptom_catalog.md (+1 up, -1 down, 0 either way);
+# a behaviour is shown as "supporting" only if it moved in this direction
+EXPECTED = {
+    "uti": {"night_toilet": 1, "sleep_episodes": 1, "sleep_hours": -1, "meals": -1},
+    "depression": {"sleep_onset_h": 1, "sleep_hours": 0, "sleep_episodes": 1, "meals": -1, "outings": -1,
+                   "time_out_h": -1, "phone_calls": -1, "guest_visits": -1},
+    "cognitive": {"sleep_onset_sd": 1, "sleep_episodes": 1, "outings": -1, "time_out_h": -1, "phone_calls": -1,
+                  "guest_visits": -1, "breakfast_h": 0},
+}
 
 
 # ---------------------------------------------------------------- analysis
@@ -126,15 +136,20 @@ def _explain(bundle: dict, windows: pd.DataFrame, frame: pd.DataFrame, a: int, b
             if grouped[f] <= 0 or len(support) == 3:
                 break
             if f == "sleep_onset_sd":
-                weekly = ref["sleep_onset_h"].rolling(7, min_periods=3).std()
-                v1, v2, sd = weekly.mean(), per["sleep_onset_h"].std(), weekly.std()
+                # same 7-day rolling SD on both sides (a 3-day change would otherwise look "regular")
+                rolling_sd = frame["sleep_onset_h"].rolling(7, min_periods=3).std()
+                weekly = rolling_sd.iloc[:REFERENCE_DAYS]
+                v1, v2, sd = weekly.mean(), rolling_sd.iloc[a:b + 1].mean(), weekly.std()
             elif f in FEATURES:
                 weekly = ref[f].rolling(7, min_periods=3).mean()
                 v1, v2, sd = ref[f].mean(), per[f].mean(), weekly.std()
             else:
                 continue
-            # SHAP may favour a class because of what did NOT change; only show behaviours that moved
-            if sd > 0 and abs(v2 - v1) >= SUPPORT_MIN_Z * sd:
+            # SHAP may favour a class because of what did NOT change (e.g. no extra toilet visits argues against UTI);
+            # a clinician should only see behaviours that moved, in the direction the symptom catalogue expects
+            expected = EXPECTED[pred].get(f)
+            moved = sd > 0 and abs(v2 - v1) >= SUPPORT_MIN_Z * sd
+            if moved and expected is not None and (expected == 0 or np.sign(v2 - v1) == expected):
                 support.append((f, v1, v2))
     return dict(status=status, condition=pred, confidence=float(cond_p[pred]), cond_p=cond_p, support=support)
 
@@ -193,13 +208,16 @@ def _date(d) -> str:
     return pd.Timestamp(d).strftime("%d %b %Y")
 
 
-def summary_rows(r: dict) -> list[str]:
+# Report content (shared by the HTML and the PDF renderers) -------------------
+
+def summary_data(r: dict) -> list[dict]:
+    """Per-ADL table: one header row per ADL, then one row per indicator."""
     frame, off, person = r["frame"], r["off"], r["person"]
     ref, period, initial = frame.iloc[:off], frame.iloc[off:], person.iloc[:REFERENCE_DAYS]
     weekly_sd = ref[list(FEATURES)].rolling(7, min_periods=3).mean().std()
     rows = []
     for adl, title in ADL.items():
-        rows.append(f'<tr class="adl"><td colspan="5">{title}</td></tr>')
+        rows.append(dict(header=title))
         for f, (f_adl, label, kind) in FEATURES.items():
             if f_adl != adl:
                 continue
@@ -208,18 +226,70 @@ def summary_rows(r: dict) -> list[str]:
             z = delta / weekly_sd[f] if weekly_sd[f] > 0 else 0.0
             arrow = "↑" if delta > 0 else "↓" if delta < 0 else "="
             dtxt = f"{arrow} {abs(delta) * 60:.0f} min" if kind == "clock" else f"{arrow} {abs(delta):.1f}"
-            flag = ' <span class="flag">unusual</span>' if abs(z) >= FLAG_Z else ""
-            first = f"<td class='muted'>{fmt(i, kind)}</td>" if r["mode"] == "rolling" else ""
-            rows.append(f"<tr><td>{label}</td>{first}<td>{fmt(b, kind)}</td><td>{fmt(p, kind)}</td><td>{dtxt}{flag}</td></tr>")
+            rows.append(dict(label=label, initial=fmt(i, kind), reference=fmt(b, kind), period=fmt(p, kind),
+                             change=dtxt, unusual=abs(z) >= FLAG_Z))
     return rows
 
 
-def chart(r: dict) -> str:
+def table_columns(r: dict) -> tuple:
+    return ("Indicator", "Initial habits", "Reference", "This period", "Change") if r["mode"] == "rolling" else \
+           ("Indicator", "Reference", "This period", "Change")
+
+
+def header_lines(r: dict, person_id: str) -> list[str]:
+    consult = pd.Timestamp(r["period_end"]) + pd.Timedelta(days=1)
+    ref = r["frame"].iloc[:r["off"]]
+    span = f"{_date(ref['day'].iloc[0])} – {_date(ref['day'].iloc[-1])}"
+    ref_txt = f"the 60 days before this period ({span})" if r["mode"] == "rolling" else \
+              f"the first 60 days of monitoring ({span})"
+    return [f"Person: {person_id} · Consultation: {_date(consult)}",
+            f"Period covered: {_date(r['period_start'])} – {_date(r['period_end'])} "
+            f"({len(r['frame']) - r['off']} days, {r['valid_share']:.0%} with data)",
+            f"Compared with: {ref_txt}"]
+
+
+DISCLAIMER = ("Decision support for the conversation, not a diagnosis. Changes are measured against the person's own "
+              "habits; hypotheses come from a model trained on simulated data.")
+NO_CHANGE = ("No change in daily routine was detected in this period. This does not mean the person is clinically "
+             "stable: the system only sees sleep, eating and social routines.")
+
+
+def warnings_text(r: dict) -> list[str]:
+    out = []
+    if r["valid_share"] < MIN_VALID_SHARE:
+        out.append(f"Insufficient data: only {r['valid_share']:.0%} of days in this period have usable recordings "
+                   f"(need ≥ {MIN_VALID_SHARE:.0%}). Interpret with caution.")
+    if r["reference_valid_share"] < MIN_VALID_SHARE:
+        out.append(f"The reference period itself has only {r['reference_valid_share']:.0%} usable days.")
+    return out
+
+
+def change_text(c: dict) -> dict:
+    """Plain-text content of one detected change: heading, sentences, supporting behaviours, all hypotheses."""
+    labels = {**FEATURES, **EXTRA}
+    head = f"{_date(c['start'])} – {_date(c['end'])} ({(c['end'] - c['start']).days + 1} d)"
+    if c["since"] < c["start"]:
+        head += f" · ongoing since {_date(c['since'])} (continues from the previous report)"
+    others = ", ".join(f"{COND[k]} {c['cond_p'][k]:.0%}" for k in c["cond_p"].sort_values(ascending=False).index)
+    support = [f"{labels[f][1]}: {fmt(v1, labels[f][2])} → {fmt(v2, labels[f][2])}" for f, v1, v2 in c["support"]]
+    if c["status"] == "unspecific":
+        lead = ("A change in daily routine was detected, but it does not match any of the patterns the system knows "
+                "(UTI, depression, cognitive decline).")
+    elif c["status"] == "indeterminate":
+        lead = f"Indeterminate: a change was detected, but no hypothesis is clearly supported ({others}). Worth discussing with the person."
+    else:
+        level = "high" if c["confidence"] >= 0.6 else "moderate"
+        lead = f"Most compatible hypothesis: {COND[c['condition']]} ({level} confidence, {c['confidence']:.0%})."
+    return dict(head=head, lead=lead, support=support, others=others if c["status"] == "hypothesis" else "",
+                condition=COND.get(c["condition"], ""), status=c["status"])
+
+
+def chart_figure(r: dict, figsize=(9, 7.2)):
     person = r["person"].iloc[:r["p1"]]
     person = person.iloc[max(0, len(person) - CHART_HISTORY_DAYS):]
     initial = r["person"].iloc[:REFERENCE_DAYS]
     day = pd.to_datetime(person["day"])
-    fig, axes = plt.subplots(4, 1, figsize=(9, 7.2), sharex=True)
+    fig, axes = plt.subplots(4, 1, figsize=figsize, sharex=True)
     for ax, f, label in zip(axes, ["sleep_onset_h", "night_toilet", "meals", "time_out_h"],
                             ("Bedtime (h)", "Night toilet visits", "Meals at home", "Hours out")):
         ax.plot(day, person[f], color="#c3cad3", lw=0.6)
@@ -235,52 +305,50 @@ def chart(r: dict) -> str:
                       fontsize=8)
     fig.autofmt_xdate()
     fig.tight_layout()
+    return fig
+
+
+# HTML renderer -----------------------------------------------------------------
+
+def chart(r: dict) -> str:
+    fig = chart_figure(r)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=80)
     plt.close(fig)
     return base64.b64encode(buf.getvalue()).decode()
 
 
+def summary_rows(r: dict) -> list[str]:
+    rows = []
+    for row in summary_data(r):
+        if "header" in row:
+            rows.append(f'<tr class="adl"><td colspan="5">{row["header"]}</td></tr>')
+            continue
+        flag = ' <span class="flag">unusual</span>' if row["unusual"] else ""
+        first = f"<td class='muted'>{row['initial']}</td>" if r["mode"] == "rolling" else ""
+        rows.append(f"<tr><td>{row['label']}</td>{first}<td>{row['reference']}</td><td>{row['period']}</td>"
+                    f"<td>{row['change']}{flag}</td></tr>")
+    return rows
+
+
 def change_block(c: dict) -> str:
-    labels = {**FEATURES, **EXTRA}
-    head = f"{_date(c['start'])} – {_date(c['end'])} ({(c['end'] - c['start']).days + 1} d)"
-    if c["since"] < c["start"]:
-        head += f" · <b>ongoing since {_date(c['since'])}</b> (continues from the previous report)"
-    lines = [f"<h3>{head}</h3>"]
-    others = ", ".join(f"{COND[k]} {c['cond_p'][k]:.0%}" for k in c["cond_p"].sort_values(ascending=False).index)
-    if c["status"] == "unspecific":
-        lines.append("<p>A change in daily routine was detected, but it does not match any of the patterns the system "
-                     "knows (UTI, depression, cognitive decline).</p>")
-    elif c["status"] == "indeterminate":
-        lines.append(f"<p><b>Indeterminate</b>: a change was detected, but no hypothesis is clearly supported "
-                     f"({others}). Worth discussing with the person.</p>")
-    else:
-        level = "high" if c["confidence"] >= 0.6 else "moderate"
-        lines.append(f"<p>Most compatible hypothesis: <b>{COND[c['condition']]}</b> ({level} confidence, {c['confidence']:.0%}).</p>")
-        if c["support"]:
-            items = "".join(f"<li>{labels[f][1]}: {fmt(v1, labels[f][2])} → {fmt(v2, labels[f][2])}</li>"
-                            for f, v1, v2 in c["support"])
-            lines.append(f"<p>Behaviours that changed:</p><ul>{items}</ul>")
-        lines.append(f'<p class="muted">All hypotheses: {others}</p>')
+    t = change_text(c)
+    head = t["head"].replace(" · ongoing since", " · <b>ongoing since").replace(" (continues", "</b> (continues")
+    lead = t["lead"].replace(t["condition"], f"<b>{t['condition']}</b>") if t["status"] == "hypothesis" else \
+        t["lead"].replace("Indeterminate:", "<b>Indeterminate</b>:")
+    lines = [f"<h3>{head}</h3><p>{lead}</p>"]
+    if t["support"]:
+        lines.append("<p>Behaviours that changed:</p><ul>" + "".join(f"<li>{s}</li>" for s in t["support"]) + "</ul>")
+    if t["others"]:
+        lines.append(f'<p class="muted">All hypotheses: {t["others"]}</p>')
     return '<div class="period">' + "".join(lines) + "</div>"
 
 
 def render(r: dict, person_id: str, truth: list[str] | None = None) -> str:
-    consult = pd.Timestamp(r["period_end"]) + pd.Timedelta(days=1)
-    ref = r["frame"].iloc[:r["off"]]
-    ref_txt = (f"the 60 days before this period ({_date(ref['day'].iloc[0])} – {_date(ref['day'].iloc[-1])})"
-               if r["mode"] == "rolling" else f"the first 60 days of monitoring ({_date(ref['day'].iloc[0])} – {_date(ref['day'].iloc[-1])})")
-    warn = ""
-    if r["valid_share"] < MIN_VALID_SHARE:
-        warn += (f'<p class="warn">Insufficient data: only {r["valid_share"]:.0%} of days in this period have usable '
-                 f"recordings (need ≥ {MIN_VALID_SHARE:.0%}). Interpret with caution.</p>")
-    if r["reference_valid_share"] < MIN_VALID_SHARE:
-        warn += f'<p class="warn">The reference period itself has only {r["reference_valid_share"]:.0%} usable days.</p>'
-    blocks = "".join(change_block(c) for c in r["changes"]) or (
-        "<p>No change in daily routine was detected in this period. <b>This does not mean the person is clinically "
-        "stable</b>: the system only sees sleep, eating and social routines.</p>")
-    cols = ("Indicator", "Initial habits", "Reference", "This period", "Change") if r["mode"] == "rolling" else \
-           ("Indicator", "Reference", "This period", "Change")
+    h = header_lines(r, person_id)
+    warn = "".join(f'<p class="warn">{w}</p>' for w in warnings_text(r))
+    blocks = "".join(change_block(c) for c in r["changes"]) or \
+        f"<p>{NO_CHANGE.replace('This does not mean the person is clinically stable', '<b>This does not mean the person is clinically stable</b>')}</p>"
     truth_html = ("<details><summary>Ground truth (simulated data, demonstration only)</summary><ul>"
                   + "".join(f"<li>{x}</li>" for x in truth) + "</ul></details>") if truth is not None else ""
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -297,17 +365,104 @@ td,th{{padding:5px 8px;border-bottom:1px solid #eef1f4;text-align:left}} tr.adl 
 img{{max-width:100%}} details{{margin-top:28px;font-size:.88em;color:#5f6b78}}
 </style></head><body>
 <h1>Pre-consultation report — activities of daily living</h1>
-<p>Person: <b>{person_id}</b> · Consultation: <b>{_date(consult)}</b><br>
-Period covered: <b>{_date(r['period_start'])} – {_date(r['period_end'])}</b> ({len(r['frame']) - r['off']} days, {r['valid_share']:.0%} with data)<br>
-Compared with: {ref_txt}</p>
-<p class="disc">Decision support for the conversation, not a diagnosis. Changes are measured against the person's own
-habits; hypotheses come from a model trained on simulated data.</p>
+<p>{h[0]}<br>{h[1]}<br>{h[2]}</p>
+<p class="disc">{DISCLAIMER}</p>
 {warn}
-<h2>1. This period at a glance</h2><table><tr>{''.join(f'<th>{c}</th>' for c in cols)}</tr>{''.join(summary_rows(r))}</table>
+<h2>1. This period at a glance</h2><table><tr>{''.join(f'<th>{c}</th>' for c in table_columns(r))}</tr>{''.join(summary_rows(r))}</table>
 <h2>2. Long-term trends</h2><img alt="Long-term trends" src="data:image/png;base64,{chart(r)}">
 <h2>3. Changes detected in this period</h2>{blocks}
 {truth_html}
 </body></html>"""
+
+
+# PDF renderer (A4, matplotlib only: no LaTeX or extra dependency, so it also runs on a small home device) ------
+
+A4 = (8.27, 11.69)
+INK, MUTED, RED, ORANGE = "#1d2733", "#5f6b78", "#b71c1c", "#ef6c00"
+
+
+class _Page:
+    """Top-down text cursor on an A4 matplotlib figure (coordinates in figure fraction)."""
+
+    def __init__(self, pdf, title=None):
+        self.pdf, self.fig, self.y = pdf, plt.figure(figsize=A4), 0.955
+        if title:
+            self.text(title, size=15, weight="bold", gap=0.03)
+
+    def text(self, s, size=9.5, color=INK, weight="normal", gap=0.018, indent=0.07, width=105):
+        import textwrap
+        for line in textwrap.wrap(s, width=width) or [""]:
+            if self.y < 0.05:
+                self.new()
+            self.fig.text(indent, self.y, line, size=size, color=color, weight=weight, va="top")
+            self.y -= gap * size / 9.5
+        return self
+
+    def space(self, h=0.01):
+        self.y -= h
+        return self
+
+    def new(self):
+        self.pdf.savefig(self.fig)
+        plt.close(self.fig)
+        self.fig, self.y = plt.figure(figsize=A4), 0.955
+
+    def close(self):
+        self.pdf.savefig(self.fig)
+        plt.close(self.fig)
+
+
+def render_pdf(r: dict, person_id: str, path, truth: list[str] | None = None) -> None:
+    from matplotlib.backends.backend_pdf import PdfPages
+    with PdfPages(path, metadata={"Title": f"Pre-consultation report — {person_id}", "Creator": "SimADL-Health"}) as pdf:
+        page = _Page(pdf, "Pre-consultation report — activities of daily living")
+        for line in header_lines(r, person_id):
+            page.text(line)
+        page.space().text(DISCLAIMER, size=8.5, color=MUTED)
+        for w in warnings_text(r):
+            page.text("⚠ " + w, color=ORANGE, weight="bold")
+
+        page.space(0.015).text("1. This period at a glance", size=11.5, weight="bold", gap=0.022)
+        cols = table_columns(r)
+        x = [0.07, 0.42, 0.56, 0.70, 0.83] if len(cols) == 5 else [0.07, 0.50, 0.66, 0.82]
+        for xi, c in zip(x, cols):
+            page.fig.text(xi, page.y, c, size=8.5, weight="bold", va="top")
+        page.y -= 0.02
+        for row in summary_data(r):
+            if "header" in row:
+                page.fig.text(0.07, page.y, row["header"], size=9, weight="bold", color=MUTED, va="top")
+            else:
+                vals = [row["label"], row["initial"], row["reference"], row["period"], row["change"]]
+                if len(cols) == 4:
+                    vals.pop(1)
+                for xi, v in zip(x, vals):
+                    page.fig.text(xi, page.y, v, size=8.5, va="top")
+                if row["unusual"]:
+                    page.fig.text(x[-1] + 0.075, page.y, "unusual", size=8, color=RED, weight="bold", va="top")
+            page.y -= 0.017
+
+        page.space(0.015).text("2. Changes detected in this period", size=11.5, weight="bold", gap=0.022)
+        if not r["changes"]:
+            page.text(NO_CHANGE)
+        for c in r["changes"]:
+            t = change_text(c)
+            page.space(0.006).text(t["head"], weight="bold", color=RED)
+            page.text(t["lead"])
+            if t["support"]:
+                page.text("Behaviours that changed:")
+                for s in t["support"]:
+                    page.text("• " + s, indent=0.09)
+            if t["others"]:
+                page.text("All hypotheses: " + t["others"], size=8.5, color=MUTED)
+        if truth is not None:
+            page.space().text("Ground truth (simulated data, demonstration only): " + "; ".join(truth), size=8, color=MUTED)
+        page.close()
+
+        fig = chart_figure(r, figsize=A4)
+        fig.suptitle("3. Long-term trends", x=0.07, ha="left", fontsize=11.5, fontweight="bold")
+        fig.subplots_adjust(top=0.93)
+        pdf.savefig(fig)
+        plt.close(fig)
 
 
 # ---------------------------------------------------------------- entry points
@@ -326,7 +481,8 @@ def report_once(events, person_id, consult=None, since=None, mode="rolling", bun
     out = (out_dir or REPORTS) / f"report_{_slug(person_id)}_{consult.date()}.html"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render(r, person_id, truth), encoding="utf-8")
-    return dict(result=r, file=out)
+    render_pdf(r, person_id, out.with_suffix(".pdf"), truth)
+    return dict(result=r, file=out, pdf=out.with_suffix(".pdf"))
 
 
 def series(events_or_person, mode="rolling", every=PERIOD_DAYS, bundle=None, meta=None) -> list[dict]:
@@ -349,11 +505,13 @@ def write_series(results: list[dict], person_id: str, truth=None) -> list:
         consult = pd.Timestamp(r["period_end"]) + pd.Timedelta(days=1)
         path = folder / f"report_{k:02d}_{consult.date()}.html"
         path.write_text(render(r, person_id, truth), encoding="utf-8")
+        render_pdf(r, person_id, path.with_suffix(".pdf"), truth)
         files.append(path)
         summary = "; ".join(
             (f"{COND[c['condition']]} ({c['confidence']:.0%})" if c["status"] == "hypothesis" else c["status"])
             + (f", ongoing since {_date(c['since'])}" if c["since"] < c["start"] else "") for c in r["changes"]) or "no change"
-        items.append(f"<tr><td><a href='{path.name}'>Report {k}</a></td><td>{_date(r['period_start'])} – "
+        items.append(f"<tr><td><a href='{path.name}'>Report {k}</a> · <a href='{path.with_suffix('.pdf').name}'>PDF</a>"
+                     f"</td><td>{_date(r['period_start'])} – "
                      f"{_date(r['period_end'])}</td><td>{summary}</td></tr>")
     (folder / "index.html").write_text(
         f"<!doctype html><html lang='en'><head><meta charset='utf-8'><title>{person_id}</title>"

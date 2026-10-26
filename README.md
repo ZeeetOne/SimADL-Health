@@ -31,7 +31,8 @@ Each report covers one period (default: the 35 days before the consultation, i.e
 a 60-day reference: `rolling` (the 60 days just before the period, default) or `initial` (the first 60 days of monitoring).
 It warns when fewer than 16 of 30 days have data, marks changes that continue from the previous report ("ongoing since"),
 says "indeterminate" when no hypothesis is clearly supported, and reminds the reader that no detected change does not
-mean clinical stability. Reports are self-contained English HTML files written from templates and computed numbers
+mean clinical stability. Each report is written as a self-contained English HTML page (screen) and an A4 PDF (to send, print or attach
+to the medical record), from templates and computed numbers
 (no generative AI). See `docs/methodology_review.md` for how this follows deployed systems and prior work.
 
 ## Reproduce the study
