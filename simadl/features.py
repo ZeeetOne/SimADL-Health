@@ -67,7 +67,7 @@ def _meal_slot(activity: str, h: float) -> str:
     return "breakfast" if 4 <= h < 11 else "lunch" if 11 <= h < 16 else "dinner"
 
 
-def daily_features(ep: pd.DataFrame) -> pd.DataFrame:
+def daily_features(ep: pd.DataFrame, min_episodes: int = MIN_EPISODES_PER_DAY) -> pd.DataFrame:
     ep = ep.copy()
     ep["day"] = _day_of(ep["start"])
     ep["h"] = _hours(ep["start"], ep["day"])
@@ -117,7 +117,7 @@ def daily_features(ep: pd.DataFrame) -> pd.DataFrame:
     out[counts] = out[counts].fillna(0).astype(int)
     out[["sleep_hours", "time_out_h", "guest_h"]] = out[["sleep_hours", "time_out_h", "guest_h"]].fillna(0.0)
 
-    out["valid"] = out["n_episodes"] >= MIN_EPISODES_PER_DAY
+    out["valid"] = out["n_episodes"] >= min_episodes
     out["weekend"] = out.index.day_of_week >= 5
     first = out.index[out["valid"]].min()
     out["split"] = np.where(out.index < first + pd.Timedelta(days=CALIBRATION_DAYS), "calibration", "holdout")
