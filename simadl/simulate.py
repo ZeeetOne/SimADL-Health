@@ -33,6 +33,15 @@ def _stats(x: pd.Series, default_mean: float = 0.0) -> tuple[float, float]:
     return (float(x.mean()), float(x.std())) if len(x) > 1 else (default_mean, 0.0)
 
 
+def _trip_minutes(ep: pd.DataFrame) -> pd.Series:
+    """Minutes between each Leave_Home and the next Enter_Home (trips < 16 h)."""
+    move = ep[ep["activity"].isin(["Leave_Home", "Enter_Home"])].reset_index(drop=True)
+    nxt = move.shift(-1)
+    trip = move[(move["activity"] == "Leave_Home") & (nxt["activity"] == "Enter_Home")]
+    minutes = (nxt.loc[trip.index, "start"] - trip["end"]).dt.total_seconds() / 60
+    return minutes[minutes < 16 * 60]
+
+
 def estimate_params(home: str) -> dict:
     daily = pd.read_csv(PROCESSED / f"{home}_daily.csv", parse_dates=["day"])
     ep = pd.read_csv(PROCESSED / f"{home}_episodes.csv", parse_dates=["start", "end"])
@@ -55,7 +64,12 @@ def estimate_params(home: str) -> dict:
             p[f"{slot}_h"] = _stats(part[f"{slot}_h"], default_mean={"breakfast": 8, "lunch": 12.5, "dinner": 18}[slot])
         p["episodes_per_meal"] = float((part["meal_episodes"] / part["meals"].where(part["meals"] > 0)).mean())
         p["outings"] = _stats(part["outings"])
-        p["trip_scale"] = 1.0  # multiplier on sampled trip durations (T4 social withdrawal)
+        p["time_out_mean"] = float(part["time_out_h"].mean())  # baselines used by T4 to size changes
+        p["trip_mean_h"] = float(_trip_minutes(ep).mean() / 60)
+        # T4 hooks (neutral values = normal behaviour)
+        p["trip_scale"] = 1.0      # multiplier on sampled trip durations
+        p["contact_scale"] = 1.0   # keep-probability for each phone call / guest visit
+        p["repeat_meal_p"] = 0.0   # chance per day of an extra (forgotten-already-eaten) meal
         # zero-inflated counts: resample whole days instead of fitting a normal
         p["phone_calls"] = part["phone_calls"].astype(int).tolist()
         p["guest_visits"] = part["guest_visits"].astype(int).tolist()
@@ -74,11 +88,7 @@ def estimate_params(home: str) -> dict:
         "Enter_Home": ep["activity"] == "Enter_Home",
     }.items():
         dur[key] = ep.loc[mask, "duration_min"].round(2).tolist()
-    move = ep[ep["activity"].isin(["Leave_Home", "Enter_Home"])].reset_index(drop=True)
-    nxt = move.shift(-1)
-    trip = move[(move["activity"] == "Leave_Home") & (nxt["activity"] == "Enter_Home")]
-    trip_min = (nxt.loc[trip.index, "start"] - trip["end"]).dt.total_seconds() / 60
-    dur["trip"] = trip_min[trip_min < 16 * 60].round(2).tolist()
+    dur["trip"] = _trip_minutes(ep).round(2).tolist()
     params["durations"] = dur
     # empirical clock hours at which social episodes start
     hour = ep["start"].dt.hour + ep["start"].dt.minute / 60
@@ -120,6 +130,19 @@ def _night(rng, p, dur, onset, wake):
     return eps
 
 
+def _meal_parts(rng, p, dur, slot):
+    """Real logs fragment mostly the cooking part: Cook x (n-2), then Eat, then Wash."""
+    n = 1 + rng.poisson(max(p["episodes_per_meal"] - 1, 0))
+    kinds = ["Cook"] * max(n - 2, 1) + (["Eat"] if n >= 2 else []) + (["Wash"] if n >= 3 else [])
+    parts, offset = [], 0.0
+    for kind in kinds:
+        d = rng.choice(dur[kind])
+        name = f"Wash_{slot.title()}_Dishes" if kind == "Wash" else f"{kind}_{slot.title()}"
+        parts.append((name, offset, d))
+        offset += d + rng.uniform(0.5, 5)
+    return parts
+
+
 def _daytime_blocks(rng, p, params, day):
     """Each block: (priority, start, [(activity, offset_min, duration_min), ...]). Meals have priority 0."""
     dur, hours = params["durations"], params["start_hours"]
@@ -128,16 +151,11 @@ def _daytime_blocks(rng, p, params, day):
     # sorted so that breakfast < lunch < dinner even when sampled times cross
     times = sorted(_normal(rng, p[f"{s}_h"], 0, 23.9) for s in slots)
     for slot, hour in zip(slots, times):
-        # real logs fragment mostly the cooking part: Cook x (n-2), then Eat, then Wash
-        n = 1 + rng.poisson(max(p["episodes_per_meal"] - 1, 0))
-        kinds = ["Cook"] * max(n - 2, 1) + (["Eat"] if n >= 2 else []) + (["Wash"] if n >= 3 else [])
-        parts, offset = [], 0.0
-        for kind in kinds:
-            d = rng.choice(dur[kind])
-            name = f"Wash_{slot.title()}_Dishes" if kind == "Wash" else f"{kind}_{slot.title()}"
-            parts.append((name, offset, d))
-            offset += d + rng.uniform(0.5, 5)
-        blocks.append((0, day + pd.Timedelta(hours=hour), parts))
+        blocks.append((0, day + pd.Timedelta(hours=hour), _meal_parts(rng, p, dur, slot)))
+    if slots and rng.random() < p["repeat_meal_p"]:
+        slot = rng.choice(slots)
+        hour = max(times) + rng.uniform(0.5, 3)
+        blocks.append((0, day + pd.Timedelta(hours=min(hour, 23.9)), _meal_parts(rng, p, dur, slot)))
 
     n_out = _count(rng, p["outings"])
     for _ in range(n_out):
@@ -146,7 +164,7 @@ def _daytime_blocks(rng, p, params, day):
         parts = [("Leave_Home", 0.0, leave), ("Enter_Home", leave + away, enter)]
         blocks.append((1, day + pd.Timedelta(hours=rng.choice(hours["Leave_Home"])), parts))
     for activity, key in [("Phone", "phone_calls"), ("Entertain_Guests", "guest_visits")]:
-        for _ in range(_count(rng, p[key])):
+        for _ in range(rng.binomial(_count(rng, p[key]), p["contact_scale"])):
             blocks.append((1, day + pd.Timedelta(hours=rng.choice(hours[activity])),
                            [(activity, 0.0, rng.choice(dur[activity]))]))
     return blocks

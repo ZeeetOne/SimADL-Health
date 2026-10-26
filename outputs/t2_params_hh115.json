@@ -34,7 +34,11 @@
       3.7333333333333334,
       1.5265852481719466
     ],
-    "trip_scale": 1.0
+    "time_out_mean": 5.221662269948412,
+    "trip_mean_h": 1.3520716470529517,
+    "trip_scale": 1.0,
+    "contact_scale": 1.0,
+    "repeat_meal_p": 0.0
   },
   "weekend": {
     "sleep_onset": [
@@ -71,6 +75,10 @@
       3.841463414634146,
       1.6365388966881846
     ],
-    "trip_scale": 1.0
+    "time_out_mean": 4.311187921480352,
+    "trip_mean_h": 1.3520716470529517,
+    "trip_scale": 1.0,
+    "contact_scale": 1.0,
+    "repeat_meal_p": 0.0
   }
 }
