@@ -84,7 +84,12 @@ Gaps compared with prior work:
 1. **T6 threshold leakage fixed**: thresholds are calibrated on the other home's normal runs. False alarms on the held-out
    home are 0.27–0.77 per 30 days, against a target of 0.5. Thresholds transfer only roughly between people, which argues for
    per-person calibration in deployment.
-2. Recorded as limitations (no code change): no random baseline in T5; daily-feature rather than sequence-level realism;
+2. **Report period and reference implemented** after this review: 35-day periods (Montreal style), rolling or initial
+   60-day reference, a data-sufficiency warning (≥ 16 / 30 days, Medicare RPM), "ongoing since", "indeterminate", and
+   "no detected change ≠ clinically stable". Detection for reports needs 3 high days in a row, and thresholds are calibrated
+   at **report level** (≤ 20 % of normal reports with a change). A day-level threshold of 0.5 false alarms per 30 days made
+   ~55 % of normal 35-day reports show a change.
+3. Recorded as limitations (no code change): no random baseline in T5; daily-feature rather than sequence-level realism;
    no real labelled health events (unlike Isudra); a 7-day window where prior work also uses 15 days.
 
 ## Positioning summary

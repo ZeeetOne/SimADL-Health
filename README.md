@@ -19,14 +19,20 @@ attributing *which* condition likely caused it, and producing a pre-consultation
 ## Use it for a person
 The models are trained once on synthetic data, then applied to anyone's activity log:
 ```bash
-python -m simadl.train                       # -> models/ (detection thresholds + attribution model)
-python -m simadl.report --events patient.csv --consult 2026-11-20 --person "Mme D." --lang fr,en
-python -m simadl.report --demo               # held-out synthetic people + two real CASAS residents
+python -m simadl.train                                   # -> models/ (thresholds + attribution model)
+python -m simadl.report --events patient.csv --person "Mrs D." --consult 2026-11-20 --since 2026-10-16
+python -m simadl.report --events patient.csv --person "Mrs D." --series   # one report every 35 days
+python -m simadl.report --demo                           # held-out synthetic people + two real CASAS residents
 ```
 `patient.csv` needs columns `activity,start,end`. Activity names follow CASAS labels (`Sleep`, `Bed_Toilet_Transition`,
-`Toilet`, `Cook_*`, `Eat_*`, `Leave_Home`, `Enter_Home`, `Phone`, `Entertain_Guests`, …). At least 74 days of history
-are required: the first 60 days are taken as the person's usual habits. The report is a self-contained HTML file in
-`outputs/reports/`, written from templates and computed numbers (no generative AI).
+`Toilet`, `Cook_*`, `Eat_*`, `Leave_Home`, `Enter_Home`, `Phone`, `Entertain_Guests`, …).
+
+Each report covers one period (default: the 35 days before the consultation, i.e. 5 of each weekday) and compares it with
+a 60-day reference: `rolling` (the 60 days just before the period, default) or `initial` (the first 60 days of monitoring).
+It warns when fewer than 16 of 30 days have data, marks changes that continue from the previous report ("ongoing since"),
+says "indeterminate" when no hypothesis is clearly supported, and reminds the reader that no detected change does not
+mean clinical stability. Reports are self-contained English HTML files written from templates and computed numbers
+(no generative AI). See `docs/methodology_review.md` for how this follows deployed systems and prior work.
 
 ## Reproduce the study
 ```bash
@@ -36,6 +42,8 @@ python -m simadl.anomalies 8                                          # T4 label
 python -m simadl.validate                                             # T5 realism
 python -m simadl.detect                                               # T6 change detection
 python -m simadl.attribute                                            # T7 condition attribution
+python -m simadl.train                                                # models for the reports
+python -m simadl.evaluate 4                                           # T9 report-level evaluation
 ```
 
 ## Setup

@@ -1,18 +1,51 @@
-synthetic_run000_hh113_normal (consult 2024-12-30): periods [] -> []
-    truth: ['normal (no anomaly injected)']
-synthetic_run008_hh113_uti (consult 2024-09-12): periods [('2024-06-30', '2024-07-18'), ('2024-08-01', '2024-08-16'), ('2024-08-29', '2024-09-11')] -> [('uti', 0.48), ('cognitive', 0.52), ('uti', 0.56)]
-    truth: ['uti, onset 2024-07-03, 5 d, intensity 0.6', 'uti, onset 2024-08-30, 8 d, intensity 0.71']
-synthetic_run016_hh113_depression (consult 2024-09-20): periods [('2024-06-27', '2024-06-28'), ('2024-07-24', '2024-07-24'), ('2024-08-07', '2024-08-13'), ('2024-08-27', '2024-09-13')] -> [('depression', 0.58), ('depression', 0.6), ('depression', 0.53), ('depression', 0.65)]
-    truth: ['depression, onset 2024-07-22, 55 d, intensity 0.789']
-synthetic_run024_hh113_cognitive (consult 2024-12-31): periods [('2024-11-28', '2024-12-04'), ('2024-12-14', '2024-12-30')] -> [('cognitive', 0.71), ('cognitive', 0.95)]
-    truth: ['cognitive, onset 2024-06-28, 186 d, intensity 0.906']
-synthetic_run032_hh115_normal (consult 2024-12-31): periods [] -> []
-    truth: ['normal (no anomaly injected)']
-synthetic_run040_hh115_uti (consult 2024-09-12): periods [('2024-07-12', '2024-07-13'), ('2024-07-23', '2024-07-26'), ('2024-09-09', '2024-09-09')] -> [('normal', 0.82), ('normal', 0.58), ('uti', 0.58)]
-    truth: ['uti, onset 2024-06-29, 8 d, intensity 0.532', 'uti, onset 2024-07-30, 7 d, intensity 0.519', 'uti, onset 2024-08-29, 9 d, intensity 0.767']
-synthetic_run048_hh115_depression (consult 2024-10-19): periods [('2024-07-28', '2024-07-28'), ('2024-09-04', '2024-09-04'), ('2024-10-17', '2024-10-18')] -> [('cognitive', 0.71), ('normal', 0.58), ('cognitive', 0.71)]
-    truth: ['depression, onset 2024-09-16, 28 d, intensity 0.511']
-synthetic_run056_hh115_cognitive (consult 2024-12-31): periods [('2024-10-06', '2024-10-14'), ('2024-10-26', '2024-10-27'), ('2024-11-11', '2024-12-19'), ('2024-12-27', '2024-12-30')] -> [('cognitive', 0.91), ('cognitive', 0.97), ('cognitive', 0.92), ('cognitive', 0.88)]
-    truth: ['cognitive, onset 2024-03-26, 280 d, intensity 0.661']
-real_casas_hh113 (consult 2012-11-05): periods [('2012-01-20', '2012-11-04')] -> [('cognitive', 0.66)]
-real_casas_hh115 (consult 2012-04-29): periods [('2012-02-17', '2012-02-19'), ('2012-03-20', '2012-03-26'), ('2012-04-03', '2012-04-28')] -> [('normal', 0.57), ('cognitive', 0.7), ('cognitive', 0.72)]
+synthetic_run016_hh113_depression: 8 reports
+    1 2024-02-29..2024-04-03 data 100%: ['unspecific']
+    2 2024-04-04..2024-05-08 data 97%: -
+    3 2024-05-09..2024-06-12 data 100%: -
+    4 2024-06-13..2024-07-17 data 100%: -
+    5 2024-07-18..2024-08-21 data 97%: ['depression']
+    6 2024-08-22..2024-09-25 data 100%: ['unspecific']
+    7 2024-09-26..2024-10-30 data 100%: -
+    8 2024-10-31..2024-12-04 data 100%: -
+   truth: ['depression, onset 2024-07-22, 55 d, intensity 0.789']
+synthetic_run008_hh113_uti: 8 reports
+    1 2024-02-29..2024-04-03 data 100%: ['cognitive']
+    2 2024-04-04..2024-05-08 data 100%: ['cognitive']
+    3 2024-05-09..2024-06-12 data 100%: -
+    4 2024-06-13..2024-07-17 data 97%: -
+    5 2024-07-18..2024-08-21 data 100%: -
+    6 2024-08-22..2024-09-25 data 100%: -
+    7 2024-09-26..2024-10-30 data 97%: -
+    8 2024-10-31..2024-12-04 data 100%: ['unspecific']
+   truth: ['uti, onset 2024-07-03, 5 d, intensity 0.6', 'uti, onset 2024-08-30, 8 d, intensity 0.71']
+synthetic_run024_hh113_cognitive: 8 reports
+    1 2024-02-29..2024-04-03 data 100%: -
+    2 2024-04-04..2024-05-08 data 100%: ['unspecific']
+    3 2024-05-09..2024-06-12 data 100%: -
+    4 2024-06-13..2024-07-17 data 100%: -
+    5 2024-07-18..2024-08-21 data 100%: ['cognitive']
+    6 2024-08-22..2024-09-25 data 100%: ['cognitive']
+    7 2024-09-26..2024-10-30 data 100%: -
+    8 2024-10-31..2024-12-04 data 94%: -
+   truth: ['cognitive, onset 2024-06-28, 186 d, intensity 0.906']
+real_casas_hh113: 12 reports
+    1 2011-08-13..2011-09-16 data 97%: ['cognitive', 'cognitive']
+    2 2011-09-17..2011-10-21 data 100%: -
+    3 2011-10-22..2011-11-25 data 80%: -
+    4 2011-11-26..2011-12-30 data 77%: ['unspecific']
+    5 2011-12-31..2012-02-03 data 100%: ['uti']
+    6 2012-02-04..2012-03-09 data 100%: ['cognitive']
+    7 2012-03-10..2012-04-13 data 97%: -
+    8 2012-04-14..2012-05-18 data 100%: -
+    9 2012-05-19..2012-06-22 data 94%: -
+   10 2012-06-23..2012-07-27 data 100%: -
+   11 2012-07-28..2012-08-31 data 100%: -
+   12 2012-09-01..2012-10-05 data 100%: ['unspecific']
+real_casas_hh115: 7 reports
+    1 2011-08-13..2011-09-16 data 94%: ['unspecific']
+    2 2011-09-17..2011-10-21 data 97%: -
+    3 2011-10-22..2011-11-25 data 100%: -
+    4 2011-11-26..2011-12-30 data 100%: -
+    5 2011-12-31..2012-02-03 data 83%: -
+    6 2012-02-04..2012-03-09 data 100%: ['depression']
+    7 2012-03-10..2012-04-13 data 100%: ['cognitive', 'cognitive']

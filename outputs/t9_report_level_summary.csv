@@ -1,0 +1,9 @@
+mode,truth,reports,sensitivity,correct,clean_normal,wrong_claim
+initial,cognitive,56,0.38,0.36,,0.02
+initial,depression,17,0.35,0.12,,0.24
+initial,normal,165,,,0.78,0.12
+initial,uti,18,0.67,0.28,,0.22
+rolling,cognitive,56,0.25,0.14,,0.02
+rolling,depression,17,0.29,0.12,,0.12
+rolling,normal,165,,,0.83,0.08
+rolling,uti,18,0.39,0.17,,0.17

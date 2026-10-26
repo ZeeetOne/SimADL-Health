@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw" / "labeled"
 PROCESSED = ROOT / "data" / "processed"
 OUTPUTS = ROOT / "outputs"
+MODELS = ROOT / "models"
 
 CALIBRATION_DAYS = 365      # first year calibrates the simulator, the rest is held out for T5
 MIN_EPISODES_PER_DAY = 10   # below this a day is treated as missing annotation, not as behaviour
