@@ -1,6 +1,7 @@
 # Symptom catalogue (Stage T3)
 
-How each condition changes the simulator parameters of T2. Every change is tagged:
+How each condition changes the simulator parameters of T2. Full notes and links for every reference: `docs/literature_notes.md`.
+Every change is tagged:
 
 - **SOURCED**: the direction *and* the magnitude come from a cited study.
 - **DIRECTION**: the direction is sourced, but the magnitude is our choice.
