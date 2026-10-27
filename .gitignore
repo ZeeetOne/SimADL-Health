@@ -17,3 +17,7 @@ Thumbs.db
 
 # Trained models (regenerate with python -m simadl.train)
 models/
+
+# Private working notes (kept locally, never published)
+CLAUDE.md
+docs/context.md
