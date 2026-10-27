@@ -21,3 +21,6 @@ models/
 # Private working notes (kept locally, never published)
 CLAUDE.md
 docs/context.md
+
+# Application slides (kept locally, never published)
+presentation/
