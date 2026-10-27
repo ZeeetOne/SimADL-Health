@@ -105,8 +105,10 @@ community with dense activity labels: \textbf{hh113} (17 months) and \textbf{hh1
 paired into episodes. Episodes over 16\,h (missed end markers) are dropped, and days with fewer than 10 labelled episodes are
 treated as missing. A day runs from noon to noon. Fourteen daily features describe the three ADL: sleep onset, wake time,
 sleep hours and episodes, night toilet visits (22:00--06:00); meals, meal episodes, breakfast and dinner times; outings,
-time out of home, phone calls and guest visits. The first 365 days of hh113 calibrate the simulator, and the remaining
-142 days are held out.
+time out of home, phone calls and guest visits. Both homes are calibrated, separately, as two personas: the first 365
+valid days of hh113 calibrate its persona and the remaining 142 days are held out to test realism; all 292 valid days of
+hh115 calibrate the second persona. hh115 is ``unseen'' only for the attribution model, which is trained on hh113 runs
+and tested on hh115 runs (and vice versa).
 
 \subsection{Normal-behaviour simulator}
 Each day is generated from weekday or weekend parameters: sleep onset and wake as mean + std $\times$ an empirical
@@ -134,14 +136,38 @@ max-$|z|$ ($\pm2\sigma$ style~\cite{shahid2022anomalies}), Isolation Forest~\cit
 and PELT~\cite{killick2012pelt}. Thresholds are calibrated on normal runs of the \emph{other} home. A random forest
 predicts \{normal, UTI, depression, cognitive\} from weekly z-scores, their 14-day changes and 3-day night signals.
 SHAP~\cite{lundberg2017shap} values give the behaviours that support a hypothesis. They are shown only if they moved at least
-$1\sigma$ in the direction the catalogue expects. A report covers 35 days (5 of each weekday) against a rolling or initial
-60-day reference. It warns when fewer than 16 of 30 days have data, marks ``ongoing since'', abstains (``indeterminate'')
+$1\sigma$ in the direction the catalogue expects. A report covers 35 days (5 of each weekday, as the monthly reports
+of~\cite{montreal2020report}) against a rolling or initial 60-day reference. It warns when fewer than 16 of 30 days have
+data (the Medicare remote-monitoring rule~\cite{cms2026rpm}), marks ``ongoing since'', abstains (``indeterminate'')
 below 45\% condition probability, and states that no detected change does not mean clinical stability. For reports,
 a detector score must stay high three days in a row, and thresholds are set so that at most 20\% of normal training
 reports show a change. All text is template-based (no generative model).
 
 % ---------------------------------------------------------------------------------------------------------------
 \section{Results}
+\subsection{Evaluation protocol and baselines (O3)}
+Ground truth is known for every simulated day. Detection thresholds come from the other home, and the report-level test
+uses 32 people simulated with new seeds that were never used for training or calibration. Every result is read against a
+simpler alternative (Table~\ref{tab:baselines}).
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{p{1.9cm}p{3.4cm}p{6.8cm}p{2.5cm}}
+\toprule
+Step & Metric & Baseline or reference & This work \\
+\midrule
+Realism & mean KS $D$ & same person, other period 0.199; other home 0.379 & \textbf{0.188} \\
+Detection & false alarms / 30 days & $\pm2\sigma$ rule at its published threshold: 3.3 & \textbf{0.27--0.77} \\
+Onset dating & change point within $\pm7$ days & chance (13 change points / run): 53\% & 50--75\% \\
+Attribution & macro-F1, unseen person & dummy classifier (majority / stratified / uniform): 0.19--0.25 & \textbf{0.58--0.59} \\
+Report & normal reports with no change & day-level thresholds: 42--50\% & \textbf{78--83\%} \\
+\bottomrule
+\end{tabular}
+\caption{Each step compared with a simpler alternative. Detection: Isolation Forest / max-$|z|$ at thresholds calibrated
+on the other home; all cognitive-decline episodes are still found.}
+\label{tab:baselines}
+\end{table}
+
 \subsection{Realism (O1)}
 Table~\ref{tab:realism} follows the SynSys logic: simulated days are compared with real days, against real-vs-real
 references. Simulated hh113 is as close to its held-out real period as the real calibration year is (KS 0.188 vs 0.199),
@@ -171,8 +197,10 @@ real hh113 vs real hh115 & reference (other home) & 0.379 & 0.99 \\
 With thresholds calibrated on the other home (false alarms 0.27--0.77 per 30 days on the held-out home, target 0.5),
 Isolation Forest detects every cognitive-decline episode (median delay 8 / 30 days in hh113 / hh115) and every depression
 episode in hh113 (6 days). Max-$|z|$ is best for the short UTI episodes in hh113 (79\%, 3 days). UTI is much harder in hh115,
-whose baseline is already two night toilet visits ($\pm1.1$). PELT is weak as an alarm, and as an onset-dating tool it is
-only slightly better than chance. Attribution transfers across persons (Table~\ref{tab:attr}). Cognitive decline is always
+whose baseline is already two night toilet visits ($\pm1.1$). With its published threshold, the $\pm2\sigma$ rule raises
+3.3 false alarms per 30 days, which is unusable in practice. PELT is weak as an alarm, and as an onset-dating tool it is
+only slightly better than chance (50--75\% of onsets within $\pm7$ days, chance 53\%). Attribution transfers across
+persons (Table~\ref{tab:attr}) and is far above a dummy classifier (macro-F1 0.19--0.25). Cognitive decline is always
 recognised. The main confusion is UTI $\rightarrow$ cognitive (12/38), because both fragment sleep. SHAP importances match
 the catalogue: night toilet visits for UTI; bedtime, sleep duration and meals for depression; bedtime irregularity,
 awakenings and outings for cognitive decline (Fig.~\ref{fig:shap}).
@@ -183,6 +211,7 @@ awakenings and outings for cognitive decline (Fig.~\ref{fig:shap}).
 \toprule
 Setting & day macro-F1 & UTI & depression & cognitive \\
 \midrule
+dummy classifier (best of three) & 0.19--0.25 & \multicolumn{3}{c}{chance: 1/3 of episodes} \\
 within hh113 (GroupKFold by run) & 0.68 & -- & -- & -- \\
 train hh113 $\rightarrow$ test hh115 & 0.58 & 8/19 & 4/8 & 8/8 \\
 train hh115 $\rightarrow$ test hh113 & 0.59 & 15/19 & 5/8 & 8/8 \\
@@ -204,7 +233,8 @@ train hh115 $\rightarrow$ test hh113 & 0.59 & 15/19 & 5/8 & 8/8 \\
 We simulated 32 new people (new seeds, never used in training) and produced a report every 35 days.
 Table~\ref{tab:report} shows the trade-off at report level. A day-level calibration of 0.5 false alarms per 30 days made
 about 55\% of normal 35-day reports show a change. After report-level calibration, most normal reports are clean, but
-sensitivity per report is modest, especially for the gradual conditions. With the \emph{initial} reference, a slow
+sensitivity per report is modest, especially for the gradual conditions. A period-level Welch test on weekly means
+(period vs reference, in the spirit of~\cite{montreal2020report}) was not consistently better, so it was not adopted. With the \emph{initial} reference, a slow
 decline stays visible, but on the real residents habit drift makes hh113 ``cognitive'' in most reports. The
 \emph{rolling} reference avoids this but absorbs slow decline. We therefore use \emph{rolling} by default and always show
 the long-term trend against the initial habits.

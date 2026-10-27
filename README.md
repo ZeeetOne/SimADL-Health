@@ -22,7 +22,7 @@ CASAS hh113/hh115 ─► simulator (normal habits) ─► symptom injection ─�
 |---|---|
 | Is simulated behaviour realistic? (O1) | Simulated hh113 vs a **held-out real year**: mean KS *D* **0.188**. Real hh113 year 1 vs its own later period: 0.199. Another real home: 0.379. A classifier still separates simulated from real days (AUC 0.89 hh113, 0.64 hh115), mainly through time out of home. |
 | Can changes be detected per person? (O2) | At 0.5 false alarms / 30 days (thresholds calibrated on the *other* home), Isolation Forest finds every cognitive-decline episode (median 8 / 30 days) and every hh113 depression episode (6 days). ±σ catches 79 % of hh113 UTI episodes (3 days). UTI is hard for hh115, whose baseline is already 2 night toilet visits. |
-| Can the cause be attributed on an unseen person? (O2) | Training on one home and testing on the other gives day macro-F1 **0.58 / 0.59**. Cognitive decline: 16/16 episodes. Depression: 9/16. UTI: 23/38. SHAP explanations match the symptom catalogue. |
+| Can the cause be attributed on an unseen person? (O2) | Training on one home and testing on the other gives day macro-F1 **0.58 / 0.59** (a dummy classifier gets 0.19–0.25). Cognitive decline: 16/16 episodes. Depression: 9/16. UTI: 23/38. SHAP explanations match the symptom catalogue. |
 | Is a 35-day report useful? (O3) | With report-level calibration, ~80 % of normal reports are clean, but report sensitivity is modest (see `outputs/t9_report_level_summary.csv`). On real residents, a fixed baseline turns habit drift into "cognitive decline", so the rolling reference is the default. |
 
 These are synthetic results and therefore optimistic. Prior work on real nurse-labelled events (Isudra) reports low
