@@ -53,7 +53,7 @@ rolling,3,hh113,normal,3,normal,False,,False,False,1.0
 rolling,3,hh113,normal,4,normal,False,,False,False,1.0
 rolling,3,hh113,normal,5,normal,False,,False,False,1.0
 rolling,3,hh113,normal,6,normal,False,,False,False,1.0
-rolling,3,hh113,normal,7,normal,True,,False,False,1.0
+rolling,3,hh113,normal,7,normal,True,cognitive,False,True,1.0
 rolling,3,hh113,normal,8,normal,True,cognitive,False,True,1.0
 initial,3,hh113,normal,1,normal,False,,False,False,1.0
 initial,3,hh113,normal,2,normal,False,,False,False,1.0
@@ -64,7 +64,7 @@ initial,3,hh113,normal,6,normal,False,,False,False,1.0
 initial,3,hh113,normal,7,normal,True,,False,False,1.0
 initial,3,hh113,normal,8,normal,False,,False,False,1.0
 rolling,4,hh113,uti,1,normal,False,,False,False,1.0
-rolling,4,hh113,uti,2,uti,True,cognitive,False,True,0.97
+rolling,4,hh113,uti,2,uti,True,"cognitive,uti",True,True,0.97
 rolling,4,hh113,uti,3,normal,True,,False,False,1.0
 rolling,4,hh113,uti,4,normal,False,,False,False,1.0
 rolling,4,hh113,uti,5,normal,True,cognitive,False,True,1.0
@@ -72,7 +72,7 @@ rolling,4,hh113,uti,6,normal,False,,False,False,1.0
 rolling,4,hh113,uti,7,normal,True,cognitive,False,True,1.0
 rolling,4,hh113,uti,8,uti,True,uti,True,False,1.0
 initial,4,hh113,uti,1,normal,False,,False,False,1.0
-initial,4,hh113,uti,2,uti,True,cognitive,False,True,0.97
+initial,4,hh113,uti,2,uti,True,uti,True,False,0.97
 initial,4,hh113,uti,3,normal,True,cognitive,False,True,1.0
 initial,4,hh113,uti,4,normal,True,cognitive,False,True,1.0
 initial,4,hh113,uti,5,normal,False,,False,False,1.0
@@ -84,7 +84,7 @@ rolling,5,hh113,uti,2,normal,False,,False,False,0.94
 rolling,5,hh113,uti,3,normal,False,,False,False,1.0
 rolling,5,hh113,uti,4,uti,False,,False,False,1.0
 rolling,5,hh113,uti,5,uti,False,,False,False,0.94
-rolling,5,hh113,uti,6,normal,True,cognitive,False,True,1.0
+rolling,5,hh113,uti,6,normal,True,,False,False,1.0
 rolling,5,hh113,uti,7,normal,False,,False,False,1.0
 rolling,5,hh113,uti,8,normal,False,,False,False,1.0
 initial,5,hh113,uti,1,normal,True,cognitive,False,True,1.0
@@ -140,7 +140,7 @@ initial,8,hh113,depression,2,normal,False,,False,False,1.0
 initial,8,hh113,depression,3,normal,False,,False,False,1.0
 initial,8,hh113,depression,4,depression,False,,False,False,1.0
 initial,8,hh113,depression,5,depression,True,uti,False,True,1.0
-initial,8,hh113,depression,6,normal,True,,False,False,1.0
+initial,8,hh113,depression,6,normal,True,uti,False,True,1.0
 initial,8,hh113,depression,7,normal,False,,False,False,1.0
 initial,8,hh113,depression,8,normal,False,,False,False,1.0
 rolling,9,hh113,depression,1,depression,True,cognitive,False,True,0.97
@@ -187,8 +187,8 @@ initial,11,hh113,depression,1,normal,False,,False,False,1.0
 initial,11,hh113,depression,2,depression,True,cognitive,False,True,1.0
 initial,11,hh113,depression,3,depression,True,depression,True,False,1.0
 initial,11,hh113,depression,4,normal,True,cognitive,False,True,1.0
-initial,11,hh113,depression,5,normal,True,cognitive,False,True,1.0
-initial,11,hh113,depression,6,normal,True,,False,False,1.0
+initial,11,hh113,depression,5,normal,True,,False,False,1.0
+initial,11,hh113,depression,6,normal,True,depression,False,True,1.0
 initial,11,hh113,depression,7,normal,False,,False,False,1.0
 initial,11,hh113,depression,8,normal,False,,False,False,1.0
 rolling,12,hh113,cognitive,1,normal,False,,False,False,1.0
@@ -240,7 +240,7 @@ initial,14,hh113,cognitive,6,cognitive,False,,False,False,1.0
 initial,14,hh113,cognitive,7,cognitive,False,,False,False,1.0
 initial,14,hh113,cognitive,8,cognitive,True,cognitive,True,False,1.0
 rolling,15,hh113,cognitive,1,cognitive,False,,False,False,1.0
-rolling,15,hh113,cognitive,2,cognitive,True,,False,False,1.0
+rolling,15,hh113,cognitive,2,cognitive,True,cognitive,True,False,1.0
 rolling,15,hh113,cognitive,3,cognitive,True,cognitive,True,False,1.0
 rolling,15,hh113,cognitive,4,cognitive,True,cognitive,True,False,1.0
 rolling,15,hh113,cognitive,5,cognitive,False,,False,False,1.0
@@ -265,7 +265,7 @@ rolling,16,hh115,normal,7,normal,False,,False,False,1.0
 rolling,16,hh115,normal,8,normal,True,cognitive,False,True,1.0
 initial,16,hh115,normal,1,normal,False,,False,False,1.0
 initial,16,hh115,normal,2,normal,False,,False,False,1.0
-initial,16,hh115,normal,3,normal,True,,False,False,1.0
+initial,16,hh115,normal,3,normal,True,cognitive,False,True,1.0
 initial,16,hh115,normal,4,normal,True,,False,False,1.0
 initial,16,hh115,normal,5,normal,False,,False,False,1.0
 initial,16,hh115,normal,6,normal,True,,False,False,1.0
@@ -300,7 +300,7 @@ initial,18,hh115,normal,2,normal,True,cognitive,False,True,1.0
 initial,18,hh115,normal,3,normal,True,cognitive,False,True,1.0
 initial,18,hh115,normal,4,normal,False,,False,False,1.0
 initial,18,hh115,normal,5,normal,True,,False,False,1.0
-initial,18,hh115,normal,6,normal,True,,False,False,1.0
+initial,18,hh115,normal,6,normal,True,cognitive,False,True,1.0
 initial,18,hh115,normal,7,normal,False,,False,False,1.0
 initial,18,hh115,normal,8,normal,True,,False,False,1.0
 rolling,19,hh115,normal,1,normal,False,,False,False,1.0
@@ -336,7 +336,7 @@ initial,20,hh115,uti,6,normal,False,,False,False,1.0
 initial,20,hh115,uti,7,normal,False,,False,False,1.0
 initial,20,hh115,uti,8,normal,False,,False,False,1.0
 rolling,21,hh115,uti,1,normal,False,,False,False,1.0
-rolling,21,hh115,uti,2,uti,True,cognitive,False,True,1.0
+rolling,21,hh115,uti,2,uti,True,"cognitive,uti",True,True,1.0
 rolling,21,hh115,uti,3,normal,False,,False,False,1.0
 rolling,21,hh115,uti,4,normal,False,,False,False,1.0
 rolling,21,hh115,uti,5,normal,False,,False,False,1.0
@@ -350,7 +350,7 @@ initial,21,hh115,uti,4,normal,False,,False,False,1.0
 initial,21,hh115,uti,5,normal,False,,False,False,1.0
 initial,21,hh115,uti,6,normal,True,"cognitive,depression",False,True,1.0
 initial,21,hh115,uti,7,normal,False,,False,False,1.0
-initial,21,hh115,uti,8,normal,True,cognitive,False,True,1.0
+initial,21,hh115,uti,8,normal,True,,False,False,1.0
 rolling,22,hh115,uti,1,normal,False,,False,False,1.0
 rolling,22,hh115,uti,2,normal,False,,False,False,1.0
 rolling,22,hh115,uti,3,normal,False,,False,False,1.0
@@ -435,7 +435,7 @@ rolling,27,hh115,depression,1,normal,False,,False,False,1.0
 rolling,27,hh115,depression,2,normal,False,,False,False,1.0
 rolling,27,hh115,depression,3,normal,False,,False,False,1.0
 rolling,27,hh115,depression,4,normal,False,,False,False,1.0
-rolling,27,hh115,depression,5,depression,True,depression,True,False,1.0
+rolling,27,hh115,depression,5,depression,True,,False,False,1.0
 rolling,27,hh115,depression,6,depression,False,,False,False,1.0
 rolling,27,hh115,depression,7,depression,False,,False,False,1.0
 rolling,27,hh115,depression,8,normal,True,,False,False,1.0

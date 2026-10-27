@@ -90,5 +90,33 @@ def main(n_per_cell: int) -> None:
     print(agg.round(2).to_string())
 
 
+def latex_table() -> None:
+    """paper/report_table.tex from the saved CSVs, so the paper always shows the latest numbers."""
+    s = pd.read_csv(OUTPUTS / "t9_report_level_summary.csv")
+    real = pd.read_csv(OUTPUTS / "t9_real_reports.csv")
+    real["claims"] = real["claims"].fillna("")
+    pct = lambda v: "--" if pd.isna(v) else f"{v:.0%}".replace("%", r"\%")
+    lines = [r"\begin{tabular}{llcccc}", r"\toprule",
+             r"Reference & Truth (reports) & Sensitivity & Correct & Clean normal & Wrong claim \\", r"\midrule"]
+    for mode in MODES:
+        for row in s[s["mode"] == mode].itertuples():
+            lines.append(f"{mode} & {row.truth} ({row.reports}) & {pct(row.sensitivity)} & {pct(row.correct)} & "
+                         f"{pct(row.clean_normal)} & {pct(row.wrong_claim)} \\\\")
+        lines.append(r"\midrule")
+    for (persona, mode), g in real.groupby(["persona", "mode"]):
+        named = (g["claims"] != "").mean()
+        cog = g["claims"].str.contains("cognitive").sum()
+        lines.append(f"{mode} & real {persona} ({len(g)}) & \\multicolumn{{4}}{{l}}{{{named:.0%} of reports name a "
+                     f"condition; {cog} name cognitive decline}} \\\\".replace("%", r"\%"))
+    lines += [r"\bottomrule", r"\end{tabular}"]
+    path = OUTPUTS.parent / "paper" / "report_table.tex"
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"wrote {path}")
+
+
 if __name__ == "__main__":
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 4)
+    if len(sys.argv) > 1 and sys.argv[1] == "--table":
+        latex_table()
+    else:
+        main(int(sys.argv[1]) if len(sys.argv) > 1 else 4)
+        latex_table()
