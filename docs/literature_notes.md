@@ -157,14 +157,14 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 
 ## Smart-home health events, anomaly detection, simulation (from the project plan)
 
-### Tanaka K. et al., 2023 — *Sensor data simulation for anomaly detection of the elderly living alone* (arXiv 2312.16852) — `READ` — T2, T3, T4, T5
+### Tanaka K., Kudo M., Kimura K., 2024 — *Sensor data simulation for anomaly detection of the elderly living alone*, IEEE Internet of Things Journal 11(19):31675–31686 (arXiv 2312.16852, Dec 2023) — `READ` — T2, T3, T4, T5
 - Links: https://arxiv.org/html/2312.16852v1 · code public · PhD thesis (Hokkaido 2025): https://eprints.lib.hokudai.ac.jp/repo/huscap/all/94927/Kai_Tanaka_review.pdf
 - Normal day is filled in three passes. Fundamental activities (sleep, breakfast) have normal start/duration. Necessary activities (urination, teeth) have Poisson daily count and normal duration. Random activities have occurrence probabilities. Parameters come from a Japanese time-use survey.
 - Anomalies: wandering, forgetting and falls have frequency/duration as functions of a latent **MMSE** (29 → 19.5 linearly over 9 years, rate from literature). **Semi-bedridden** (~once / 20 months, ~30 days, +40-min nap, more rest) and **housebound** (~once / 10 months, ~14 days, **fewer outings and phone calls**) are fixed and independent of MMSE.
 - Realism: no comparison with real anomalies. Normal sequences are compared by a Levenshtein day-to-day similarity vs Kasteren (24 d) and CASAS Aruba (74 d test).
 - Many coefficients are assumed (linear MMSE coefficients, SD = D/5, fixed frequencies).
 
-### Tanaka K. et al., 2024 — *Long-term detection system for six kinds of abnormal behavior of the elderly living alone* (arXiv 2411.13153) — `READ` — T6, T7, T9
+### Tanaka K., Kudo M., Kimura K., Nakamura A., 2024 — *Long-term detection system for six kinds of abnormal behavior of the elderly living alone* (arXiv 2411.13153, no journal version yet) — `READ` — T6, T7, T9
 - Link: https://arxiv.org/html/2411.13153v1
 - 5 m × 12 m studio, 41 binary sensors. **Train on 9 simulated years, test on 9 other simulated years. No real data**, which is stated as future work.
 - Semi-bedridden / housebound: daily sleep duration and going-out frequency vs **mean ± c·σ over consecutive days** (c chosen to maximise F1 on training data). Forgetting: decision tree on 2-hour windows. Falls while walking: random forest. Wandering: HMM / dynamic naive Bayes.
@@ -210,7 +210,7 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 - Links: https://zenodo.org/records/15800764 · https://zenodo.org/records/15800926
 - Anomalies injected per home area, with day-level ground truth. The injection method is not described on the record page. These could serve as an external benchmark.
 
-### You W. et al., 2025 — ADLGen (arXiv 2505.17987) — `SNIPPET`
+### You Weihang, Jiang H., Liu Z., Xie Z., Liu T., Lu J., Dou F., 2025 — ADLGen (arXiv 2505.17987) — `SNIPPET` (authors verified)
 - Link: https://arxiv.org/abs/2505.17987v1 — preprint. Claims gains in statistical fidelity, semantic richness and downstream activity recognition over baseline generators. Metrics are not visible from the abstract (the full PDF was too large to fetch).
 
 ### Fritz R., Wuestney K., Dermody G., Cook D., 2022 — *Nurse-in-the-loop smart home detection of health events*, Int J Nursing Studies Advances — `SNIPPET` — T3, T8
@@ -233,7 +233,9 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 ### Tanaka et al. — simulator-based detection of typical anomalies — `MEMORY` — T7
 - Classifier trained on simulator data, with parameters tuned per anomaly (semi-bedridden, not leaving home, forgetting, wandering, falls). This is "train in simulation, detect anomaly type", the same as our T7.
 
-### Shahid Z. K., Saguna S., Åhlund C., 2022 — JMIR Aging — `MEMORY` — T6 baseline
+### Shahid Z. K., Saguna S., Åhlund C., 2022 — *Detecting anomalies in daily activity routines of older persons in single resident smart homes: proof-of-concept study*, JMIR Aging 5(2):e28260 — `SNIPPET` (bibliography verified) — T6 baseline
+- Links: https://aging.jmir.org/2022/2/e28260 · correction: https://pmc.ncbi.nlm.nih.gov/articles/PMC11094591/
+- 12 apartments in northern Sweden, ~2 years. Anomaly when an activity duration in an hourly window falls outside mean ± k·SD (parametric). Notifies relatives in near real time.
 - About 2 years of smart-home data from older adults. Anomaly if activity duration is outside [μ − 2σ, μ + 2σ] or the activity is missing.
 
 ### Killick R., Fearnhead P., Eckley I., 2012 — *Optimal detection of changepoints with a linear computational cost* (PELT), JASA — `MEMORY` — T6
@@ -263,7 +265,7 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 
 ## Real-world deployments and edge computing
 
-### Montreal AAL single-case study — *Using ambient assisted living to monitor older adults with Alzheimer disease: single-case study to validate the monitoring report*, JMIR Aging 2020 — `READ` — T8 (key for report period)
+### Montreal AAL single-case study — *Using ambient assisted living to monitor older adults with Alzheimer disease: single-case study to validate the monitoring report*, Lussier M. et al. (14 authors), **JMIR Medical Informatics** 8(11):e20215, 2020 (earlier noted here wrongly as JMIR Aging) — `READ` — T8 (key for report period)
 - Links: https://pmc.ncbi.nlm.nih.gov/articles/PMC7695528/ · https://pubmed.ncbi.nlm.nih.gov/33185555/
 - 91-year-old woman with AD living alone, public home care (CLSC), Montreal. 490 days of monitoring.
 - **Monthly report emailed to the care professional** ("frequent enough"). Periods of **35 days = 5 of each weekday**. **First month = baseline**, compared month by month with linear mixed models (month, weekday). Cooking/hygiene events flagged at 2 SD above the person's mean.
@@ -282,7 +284,9 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 - Links: https://digitalhealthuptake.eu/radar-repository/sensara-a-sensor-technology-for-nursing-home-rooms/ · https://www.overons.kpn/en/news/2019/kpn-ventures-expands-investment-in-sensara
 - TNO spin-off (2013). Camera-free sensors and a self-learning algorithm for individual patterns. Deviations (e.g. more night activity, bathroom changes) are pushed as notifications to carers or family. Home-care pilots (Careyn, dementia case managers).
 
-### US Medicare remote patient monitoring — CPT 99454 / 99445 (CY2026) — `SNIPPET` (vendor/legal summaries; verify against the CMS PFS final rule)
+### US Medicare remote patient monitoring — CPT 99454 / 99445 (CY2026 Physician Fee Schedule final rule, Nov 2025) — `SNIPPET` (consistent across several secondary sources)
+- https://www.physicianspractice.com/view/2026-physician-fee-schedule-final-rule-is-here-what-it-means-for-rpm-and-remote-care · https://www.tenovi.com/cpt-code-99445-remote-patient-monitoring/
+- 99454: 16–30 days of data in a 30-day period; 99445 (new): 2–15 days; not billable together.
 - Links: https://med.uth.edu/mshbc/digital-health-services/remote-patient-monitoring-rpm/ · https://www.beneschlaw.com/insight/cms-proposes-comprehensive-updates-to-remote-patient-monitoring-and-remote-therapeutic-monitoring-reimbursement/pdf/
 - Billing per 30-day period. 99454 needs device data on **≥ 16 of 30 days**, and 99445 (new) covers 2–15 days. A real-world data-sufficiency rule.
 
@@ -313,6 +317,16 @@ Where it is used: `T3` = symptom catalogue, `T6`/`T7` = methods, `POS` = backgro
 - Links: https://docs.oracle.com/en/industries/health/millennium-platform-apis/mfrap/document_reference.html · https://docs.ehealth.sundhed.dk/v2.5.0/ig/OperationDefinition--s-transform-to-PHMR.html
 - FHIR `DocumentReference` indexes clinical documents of any mime type (PDF included), retrieved via `Binary`. Denmark's national eHealth infrastructure uses the HL7 **PHMR** (Personal Health Monitoring Report) for home-monitoring data, convertible to FHIR Observation and Composition.
 - Takeaway: clinical systems exchange **PDF (in CDA / DocumentReference) or structured PHMR / FHIR**, not LaTeX. SimADL-Health therefore outputs HTML for screens and an A4 PDF for exchange. LaTeX is only used for the technical paper.
+
+## Bibliographic verification (2026-10-28)
+
+All references cited in `paper/main.tex` were checked against publisher pages, PubMed/PMC, arXiv or DOAJ. Corrections made in `paper/refs.bib`:
+- **Montreal study**: journal is *JMIR Medical Informatics* 8(11):e20215 (not JMIR Aging); first author Maxime Lussier, 14 authors. DOI 10.2196/20215.
+- **ADLGen**: first author is *Weihang* You (not "Weihua"); 7 authors.
+- **Tanaka et al. 2023**: published in IEEE Internet of Things Journal 11(19):31675–31686 (2024), DOI 10.1109/JIOT.2024.3421548. Authors Tanaka, Kudo, Kimura. The 2024 detection paper (Tanaka, Kudo, Kimura, Nakamura) is still arXiv-only.
+- Details added: Bouchabou et al. 2023 *Sensors* 23(17):7586, doi 10.3390/s23177586 · Fleury et al. 2010 IEEE TITB 14(2):274–283, doi 10.1109/TITB.2009.2037317 · Vacher et al. 2011 IJEHMC 2(1):35–54 · Shahid et al. 2022 JMIR Aging 5(2):e28260 · Cejudo, Beristain, Almeida, Rebescher, Martín, Macía 2025, *Med. Biol. Eng. Comput.* 63(6):1821–1835, doi 10.1007/s11517-025-03308-y · Capstick et al. 2024 npj Digit. Med. 7, doi 10.1038/s41746-023-00995-5.
+- MinderCare: ISRCTN14997677, funded to Imperial College London and Imperial College Healthcare NHS Trust (LifeArc listing, https://www.lifearc.org/clinical-trial/mindercare-translational-research-and-digitally-enabled-care); registration date not found. A protocol preprint (June 2026) describes 100 people with dementia monitored for ≥ 12 months.
+- Not cited and not checked: Dahmen 2019 thesis, Fritz et al. 2022 (kept in refs.bib for later).
 
 ## Dataset
 

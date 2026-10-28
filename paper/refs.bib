@@ -1,5 +1,5 @@
-% Status of each entry mirrors docs/literature_notes.md.
-% Entries marked "% verify" were cited from memory or search snippets: check authors/pages before submission.
+% Bibliographic details checked against publisher pages, PubMed/PMC, arXiv or DOAJ on 2026-10-28
+% (see docs/literature_notes.md). Remaining caveats are noted per entry.
 
 @article{dahmen2019synsys,
   author  = {Dahmen, Jessamyn and Cook, Diane J.},
@@ -20,22 +20,27 @@
   year    = {2021}
 }
 
-@phdthesis{dahmen2019thesis, % verify
+@phdthesis{dahmen2019thesis, % not cited in the paper; details not checked
   author = {Dahmen, Jessamyn},
   title  = {Automated Health Event Detection in Smart Homes},
   school = {Washington State University},
   year   = {2019}
 }
 
-@misc{tanaka2023simulation, % verify full author list
-  author       = {Tanaka, Kai and others},
-  title        = {Sensor Data Simulation for Anomaly Detection of the Elderly Living Alone},
-  howpublished = {arXiv:2312.16852},
-  year         = {2023}
+@article{tanaka2023simulation,
+  author  = {Tanaka, Kai and Kudo, Mineichi and Kimura, Keigo},
+  title   = {Sensor Data Simulation for Anomaly Detection of the Elderly Living Alone},
+  journal = {IEEE Internet of Things Journal},
+  volume  = {11},
+  number  = {19},
+  pages   = {31675--31686},
+  year    = {2024},
+  doi     = {10.1109/JIOT.2024.3421548},
+  note    = {arXiv:2312.16852}
 }
 
-@misc{tanaka2024detection, % verify full author list
-  author       = {Tanaka, Kai and others},
+@misc{tanaka2024detection,
+  author       = {Tanaka, Kai and Kudo, Mineichi and Kimura, Keigo and Nakamura, Atsuyoshi},
   title        = {Long-term Detection System for Six Kinds of Abnormal Behavior of the Elderly Living Alone},
   howpublished = {arXiv:2411.13153},
   year         = {2024}
@@ -51,8 +56,8 @@
   year    = {2018}
 }
 
-@misc{you2025adlgen, % verify full author list
-  author       = {You, Weihua and others},
+@misc{you2025adlgen,
+  author       = {You, Weihang and Jiang, Hanqi and Liu, Zishuai and Xie, Zihang and Liu, Tianming and Lu, Jin and Dou, Fei},
   title        = {{ADLGen}: Synthesizing Symbolic, Event-Triggered Sensor Sequences for Human Activity Modeling},
   howpublished = {arXiv:2505.17987},
   year         = {2025}
@@ -68,32 +73,47 @@
   year    = {2021}
 }
 
-@article{bouchabou2023twin, % verify volume/pages
+@article{bouchabou2023twin,
   author  = {Bouchabou, Damien and Grosset, Juliette and Nguyen, Sao Mai and Lohr, Christophe and Puig, Xavier},
   title   = {A Smart Home Digital Twin to Support the Recognition of Activities of Daily Living},
   journal = {Sensors},
-  year    = {2023}
+  volume  = {23},
+  number  = {17},
+  pages   = {7586},
+  year    = {2023},
+  doi     = {10.3390/s23177586}
 }
 
-@article{fleury2010svm, % verify year/pages
+@article{fleury2010svm,
   author  = {Fleury, Anthony and Vacher, Michel and Noury, Norbert},
   title   = {{SVM}-Based Multimodal Classification of Activities of Daily Living in Health Smart Homes: Sensors, Algorithms, and First Experimental Results},
   journal = {IEEE Transactions on Information Technology in Biomedicine},
-  year    = {2010}
+  volume  = {14},
+  number  = {2},
+  pages   = {274--283},
+  year    = {2010},
+  doi     = {10.1109/TITB.2009.2037317}
 }
 
-@article{vacher2011audio, % verify
+@article{vacher2011audio,
   author  = {Vacher, Michel and Portet, Fran{\c{c}}ois and Fleury, Anthony and Noury, Norbert},
   title   = {Development of Audio Sensing Technology for Ambient Assisted Living: Applications and Challenges},
   journal = {International Journal of E-Health and Medical Communications},
+  volume  = {2},
+  number  = {1},
+  pages   = {35--54},
   year    = {2011}
 }
 
-@article{shahid2022anomalies, % verify title
+@article{shahid2022anomalies,
   author  = {Shahid, Zahraa Khais and Saguna, Saguna and {\AA}hlund, Christer},
   title   = {Detecting Anomalies in Daily Activity Routines of Older Persons in Single Resident Smart Homes: Proof-of-Concept Study},
   journal = {JMIR Aging},
-  year    = {2022}
+  volume  = {5},
+  number  = {2},
+  pages   = {e28260},
+  year    = {2022},
+  doi     = {10.2196/28260}
 }
 
 @inproceedings{sprint2016bcd,
@@ -103,18 +123,24 @@
   year      = {2016}
 }
 
-@article{cejudo2025anomaly, % verify author list
-  author  = {Cejudo, Ander and others},
+@article{cejudo2025anomaly,
+  author  = {Cejudo, Ander and Beristain, Andoni and Almeida, Aitor and Rebescher, Kristin and Mart{\'i}n, Cristina and Mac{\'i}a, Iv{\'a}n},
   title   = {Smart Home-Assisted Anomaly Detection System for Older Adults: A Deep Learning Approach with a Comprehensive Set of Daily Activities},
-  journal = {PMC12106144},
-  year    = {2025}
+  journal = {Medical \& Biological Engineering \& Computing},
+  volume  = {63},
+  number  = {6},
+  pages   = {1821--1835},
+  year    = {2025},
+  doi     = {10.1007/s11517-025-03308-y}
 }
 
 @article{capstick2024uti,
   author  = {Capstick, Alexander and others},
   title   = {Digital Remote Monitoring for Screening and Early Detection of Urinary Tract Infections},
   journal = {npj Digital Medicine},
-  year    = {2024}
+  volume  = {7},
+  year    = {2024},
+  doi     = {10.1038/s41746-023-00995-5}
 }
 
 @inproceedings{ugwu2026clinician,
@@ -125,7 +151,7 @@
   year      = {2026}
 }
 
-@article{fritz2022nurse, % verify title
+@article{fritz2022nurse, % not cited in the paper; title not checked
   author  = {Fritz, Roschelle and Wuestney, Katherine and Dermody, Gordana and Cook, Diane J.},
   title   = {Nurse-in-the-Loop Smart Home Detection of Health Events Associated with Diagnosed Chronic Conditions: A Case-Event Series},
   journal = {International Journal of Nursing Studies Advances},
@@ -152,23 +178,28 @@
   year    = {2020}
 }
 
-@misc{montreal2020report, % verify authors and journal
-  title        = {Using Ambient Assisted Living to Monitor Older Adults With {Alzheimer} Disease: Single-Case Study to Validate the Monitoring Report},
-  howpublished = {JMIR, 2020. PMC7695528},
-  year         = {2020}
+@article{montreal2020report,
+  author  = {Lussier, Maxime and others},
+  title   = {Using Ambient Assisted Living to Monitor Older Adults With {Alzheimer} Disease: Single-Case Study to Validate the Monitoring Report},
+  journal = {JMIR Medical Informatics},
+  volume  = {8},
+  number  = {11},
+  pages   = {e20215},
+  year    = {2020},
+  doi     = {10.2196/20215}
 }
 
-@misc{cms2026rpm, % verify against the CMS CY2026 Physician Fee Schedule final rule
+@misc{cms2026rpm,
   author       = {{Centers for Medicare \& Medicaid Services}},
-  title        = {Remote Patient Monitoring: {CPT} 99454 (device data on at least 16 of 30 days) and 99445 (2--15 days)},
-  howpublished = {CY2026 Physician Fee Schedule},
-  year         = {2026}
+  title        = {Remote Patient Monitoring: {CPT} 99454 (device data on 16--30 days of a 30-day period) and 99445 (2--15 days)},
+  howpublished = {CY 2026 Medicare Physician Fee Schedule Final Rule},
+  year         = {2025}
 }
 
-@misc{mindercare, % verify
+@misc{mindercare,
   title        = {{MinderCare}: Translational Research and Digitally Enabled Care},
-  howpublished = {ISRCTN14997677},
-  year         = {2023}
+  howpublished = {ISRCTN registry, ISRCTN14997677; Imperial College London and Imperial College Healthcare NHS Trust},
+  note         = {Accessed October 2026}
 }
 
 @article{fiori2025llm,
